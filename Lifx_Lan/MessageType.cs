@@ -6,13 +6,22 @@ using System.Threading.Tasks;
 
 namespace Lifx_Lan
 {
-    internal enum Types : ushort
+    internal enum MessageType : ushort
     {
         ////////////////
         //Get Messages//
         ////////////////
 
         //Discovery
+        /// <summary>
+        /// This packet is used for Discovery of devices. 
+        /// Typically you would broadcast this message to the network (with tagged field in the header set to 0 and the target field in the header set to all zeros)
+        /// 
+        /// Each device on the network that receives this packet will send back multiple StateService (3) messages that say what services are available and the port those services are on.
+        /// 
+        /// The only StateService (3) message you care about will tell you that UDP is available on a port that is usually 56700. 
+        /// You can determine the IP address of the device from information your UDP socket should receive when it gets those bytes.
+        /// </summary>
         GetService = 2,
 
         //Device

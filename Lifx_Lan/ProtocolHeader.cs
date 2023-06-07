@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +21,7 @@ namespace Lifx_Lan
         /// <summary>
         /// Message type determines the payload being used
         /// </summary>
-        public Types Type { get; }
+        public MessageType Type { get; }
 
         /// <summary>
         /// Any fields named reserved should be set to all 0s.
@@ -29,9 +31,16 @@ namespace Lifx_Lan
         /// <summary>
         /// 
         /// </summary>
-        public ProtocolHeader() 
-        { 
+        public ProtocolHeader(MessageType type) 
+        {
+            Type = type;
+        }
 
+        public byte[] ToBytes()
+        {
+            byte[] typeByte = BitConverter.GetBytes((ushort)Type);
+
+            return Reserved_1.Concat(typeByte).Concat(Reserved_2).ToArray();
         }
     }
 }

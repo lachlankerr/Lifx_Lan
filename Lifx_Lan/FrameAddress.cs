@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace Lifx_Lan
         /// It is recommended you set ack_required=1 and res_required=0 when you change the device with a Set message. 
         /// When you send a Get message it is best to set ack_required=0 and res_required=0, because these messages trigger an implicit State response.
         /// </summary>
-        public bool Ack_required { get; } = false;
+        public bool Ack_required { get; } = true;
 
         /// <summary>
         /// Any fields named reserved should be set to all 0s.
@@ -71,7 +72,33 @@ namespace Lifx_Lan
         /// </summary>
         public FrameAddress() 
         { 
+            Target = new byte[] { 0xD0, 0x73, 0xD5, 0x2D, 0x8D, 0xA2, 0x00, 0x00 };
+        }
 
+        public byte[] ToBytes()
+        {
+            byte[] reservedByte = new byte[1];
+            byte[] sequenceByte = { Sequence };
+
+            BitArray reservedBits = new BitArray(reservedByte);
+
+            reservedBits.Set(0, Res_required);
+            reservedBits.Set(1, Ack_required);
+            reservedBits.Set(2, Reserved_2[4]);
+            reservedBits.Set(4, Reserved_2[3]);
+            reservedBits.Set(5, Reserved_2[2]);
+            reservedBits.Set(6, Reserved_2[1]);
+            reservedBits.Set(7, Reserved_2[0]);
+            reservedBits.CopyTo(reservedByte, 0);
+
+            /*for (int i = 0; i < 16; i++)
+            {
+                if (i % 8 == 0)
+                    Console.WriteLine("");
+                Console.WriteLine(protocolBits[i]);
+            }*/
+
+            return Target.Concat(Reserved_1).Concat(reservedByte).Concat(sequenceByte).ToArray();
         }
     }
 }

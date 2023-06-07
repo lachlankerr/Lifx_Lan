@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -41,7 +42,7 @@ namespace Lifx_Lan
         /// <summary>
         /// Message origin indicator: must be zero (0)
         /// </summary>
-        public byte Origin { get; } = 0;
+        public BitArray Origin { get; } = new BitArray(2);
 
         /// <summary>
         /// Source identifier: unique value set by the client, used by responses.
@@ -63,6 +64,30 @@ namespace Lifx_Lan
         {
             Size = size;
             Tagged = tagged;
+        }
+
+        public byte[] ToBytes()
+        {
+            byte[] sizeBytes = BitConverter.GetBytes(Size);
+            byte[] protocolBytes = BitConverter.GetBytes(Protocol);
+            byte[] sourceBytes = BitConverter.GetBytes(Source);
+
+            BitArray protocolBits = new BitArray(protocolBytes);
+
+            protocolBits.Set(8 + 4, Addressable);
+            protocolBits.Set(8 + 5, Tagged);
+            protocolBits.Set(8 + 6, Origin[1]);
+            protocolBits.Set(8 + 7, Origin[0]);
+            protocolBits.CopyTo(protocolBytes, 0);
+
+            /*for (int i = 0; i < 16; i++)
+            {
+                if (i % 8 == 0)
+                    Console.WriteLine("");
+                Console.WriteLine(protocolBits[i]);
+            }*/
+
+            return sizeBytes.Concat(protocolBytes).Concat(sourceBytes).ToArray();
         }
     }
 }
