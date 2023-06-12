@@ -64,70 +64,21 @@ namespace Lifx_Lan
 
         public static UInt16 GetProtocol(byte[] data)
         {
-            /*byte[] relevantBytes = data.Skip(2).Take(2).ToArray();
-            BitArray bitArray = new BitArray(relevantBytes);
-            BitArray mask = new BitArray(new bool[]
-            {
-                true, true, true, true, true, true, true, true,
-                true, true, true, true, false, false, false, false, 
-            });
-            BitArray bits = bitArray.And(mask);
-
-            byte[] bytes = new byte[2];
-            bits.CopyTo(bytes, 0);
-            return BitConverter.ToUInt16(bytes, 0);*/
-
             return BitConverter.ToUInt16(Mask(data, 2, 2, "1111111111110000"), 0);
         }
 
         public static bool GetAddressable(byte[] data)
         {
-            /*byte[] relevantBytes = data.Skip(3).Take(1).ToArray();
-            BitArray bitArray = new BitArray(relevantBytes);
-            BitArray mask = new BitArray(new bool[]
-            {
-                false, false, false, false, true, false, false, false,
-            });
-            BitArray bits = bitArray.And(mask);
-
-            byte[] bytes = new byte[1];
-            bits.CopyTo(bytes, 0);
-            return BitConverter.ToBoolean(bytes, 0);*/
-
             return BitConverter.ToBoolean(Mask(data, 3, 1, "00001000"), 0);
         }
 
         public static bool GetTagged(byte[] data)
         {
-            /*byte[] relevantBytes = data.Skip(3).Take(1).ToArray();
-            BitArray bitArray = new BitArray(relevantBytes);
-            BitArray mask = new BitArray(new bool[]
-            {
-                false, false, false, false, false, true, false, false,
-            });
-            BitArray bits = bitArray.And(mask);
-
-            byte[] bytes = new byte[1];
-            bits.CopyTo(bytes, 0);
-            return BitConverter.ToBoolean(bytes, 0);*/
-
             return BitConverter.ToBoolean(Mask(data, 3, 1, "00000100"), 0);
         }
 
         public static byte GetOrigin(byte[] data)
         {
-            /*byte[] relevantBytes = data.Skip(3).Take(1).ToArray();
-            BitArray bitArray = new BitArray(relevantBytes);
-            BitArray mask = new BitArray(new bool[]
-            {
-                false, false, false, false, false, false, true, true,
-            });
-            BitArray bits = bitArray.And(mask);
-
-            byte[] bytes = new byte[1];
-            bits.CopyTo(bytes, 0);
-            return bytes[0];*/
-
             return Mask(data, 3, 1, "00000011")[0];
         }
 
@@ -148,52 +99,16 @@ namespace Lifx_Lan
 
         public static bool GetRes_Required(byte[] data)
         {
-            /*byte[] relevantBytes = data.Skip(22).Take(1).ToArray();
-            BitArray bitArray = new BitArray(relevantBytes);
-            BitArray mask = new BitArray(new bool[]
-            {
-                true, false, false, false, false, false, false, false
-            });
-            BitArray bits = bitArray.And(mask);
-
-            byte[] bytes = new byte[1];
-            bits.CopyTo(bytes, 0);
-            return BitConverter.ToBoolean(bytes, 0);*/
-
             return BitConverter.ToBoolean(Mask(data, 22, 1, "10000000"), 0);
         }
 
         public static bool GetAck_Required(byte[] data)
         {
-            /*byte[] relevantBytes = data.Skip(22).Take(1).ToArray();
-            BitArray bitArray = new BitArray(relevantBytes);
-            BitArray mask = new BitArray(new bool[]
-            {
-                false, true, false, false, false, false, false, false
-            });
-            BitArray bits = bitArray.And(mask);
-
-            byte[] bytes = new byte[1];
-            bits.CopyTo(bytes, 0);
-            return BitConverter.ToBoolean(bytes, 0);*/
-
             return BitConverter.ToBoolean(Mask(data, 22, 1, "01000000"), 0);
         }
 
         public static byte[] GetReserved3(byte[] data)
         {
-            /*byte[] relevantBytes = data.Skip(22).Take(1).ToArray();
-            BitArray bitArray = new BitArray(relevantBytes);
-            BitArray mask = new BitArray(new bool[]
-            {
-                false, false, true, true, true, true, true, true
-            });
-            BitArray bits = bitArray.And(mask);
-
-            byte[] bytes = new byte[1];
-            bits.CopyTo(bytes, 0);
-            return bytes;*/
-
             return Mask(data, 22, 1, "00111111");
         }
 
@@ -235,22 +150,6 @@ namespace Lifx_Lan
             Console.WriteLine("Reserved4:\t" + BitConverter.ToString(GetReserved4(data)));
             Console.WriteLine("Pkt_Type:\t" + GetPkt_Type(data) + " (" + (ushort)GetPkt_Type(data) + ")");
             Console.WriteLine("Reserved5:\t" + BitConverter.ToString(GetReserved5(data)));
-        }
-
-        public static void PrintValues(IEnumerable myList, int myWidth)
-        {
-            int i = myWidth;
-            foreach (Object obj in myList)
-            {
-                if (i <= 0)
-                {
-                    i = myWidth;
-                    Console.WriteLine();
-                }
-                i--;
-                Console.Write("{0,8}", obj);
-            }
-            Console.WriteLine();
         }
     }
 }
