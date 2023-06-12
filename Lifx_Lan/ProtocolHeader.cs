@@ -16,31 +16,31 @@ namespace Lifx_Lan
         /// <summary>
         /// Any fields named reserved should be set to all 0s.
         /// </summary>
-        public byte[] Reserved_1 { get; } = new byte[8];
+        public byte[] Reserved4 { get; } = new byte[8];
 
         /// <summary>
         /// Message type determines the payload being used
         /// </summary>
-        public MessageType Type { get; }
+        public Pkt_Type Pkt_Type { get; }
 
         /// <summary>
         /// Any fields named reserved should be set to all 0s.
         /// </summary>
-        public byte[] Reserved_2 { get; } = new byte[2];
+        public byte[] Reserved5 { get; } = new byte[2];
 
         /// <summary>
         /// 
         /// </summary>
-        public ProtocolHeader(MessageType type) 
+        public ProtocolHeader(Pkt_Type type) 
         {
-            Type = type;
+            Pkt_Type = type;
         }
 
         public byte[] ToBytes()
         {
-            byte[] typeByte = BitConverter.GetBytes((ushort)Type);
+            byte[] typeByte = BitConverter.GetBytes((ushort)Pkt_Type);
 
-            return Reserved_1.Concat(typeByte).Concat(Reserved_2).ToArray();
+            return Reserved4.Concat(typeByte).Concat(Reserved5).ToArray();
         }
     }
 }

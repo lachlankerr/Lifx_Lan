@@ -21,11 +21,16 @@ namespace Lifx_Lan
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="data"></param>
         public Payload(byte[] data) 
         {
             Data = data;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public byte[] ToBytes()
         {
             return Data;

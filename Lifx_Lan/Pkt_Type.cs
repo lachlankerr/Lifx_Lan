@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lifx_Lan
 {
-    internal enum MessageType : ushort
+    internal enum Pkt_Type : ushort
     {
         ////////////////
         //Get Messages//
@@ -64,6 +64,11 @@ namespace Lifx_Lan
         ////////////////
 
         //Device
+        /// <summary>
+        /// This packet lets you set the current level of power on the device.
+        /// </summary>
+        /// <param name="level">Uint16 : If you specify 0 the light will turn off and if you specify 65535 the device will turn on.</param>
+        /// <returns>StatePower (22) message</returns>
         SetPower = 21,
         SetLabel = 24,
         SetReboot = 38,
@@ -98,6 +103,9 @@ namespace Lifx_Lan
         //////////////////
 
         //Core
+        /// <summary>
+        /// This packet is returned when you specify ack_required=1.
+        /// </summary>
         Acknowledgement = 45,
 
         //Discovery

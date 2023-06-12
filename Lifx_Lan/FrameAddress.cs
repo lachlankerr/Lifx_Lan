@@ -26,7 +26,7 @@ namespace Lifx_Lan
         /// <summary>
         /// Any fields named reserved should be set to all 0s.
         /// </summary>
-        public byte[] Reserved_1 { get; } = new byte[6];
+        public byte[] Reserved2 { get; } = new byte[6];
 
         /// <summary>
         /// State message required.
@@ -53,7 +53,7 @@ namespace Lifx_Lan
         /// <summary>
         /// Any fields named reserved should be set to all 0s.
         /// </summary>
-        public BitArray Reserved_2 { get; } = new BitArray(6);
+        public BitArray Reserved3 { get; } = new BitArray(6);
 
         /// <summary>
         /// Wrap around message sequence number
@@ -84,11 +84,11 @@ namespace Lifx_Lan
 
             reservedBits.Set(0, Res_required);
             reservedBits.Set(1, Ack_required);
-            reservedBits.Set(2, Reserved_2[4]);
-            reservedBits.Set(4, Reserved_2[3]);
-            reservedBits.Set(5, Reserved_2[2]);
-            reservedBits.Set(6, Reserved_2[1]);
-            reservedBits.Set(7, Reserved_2[0]);
+            reservedBits.Set(2, Reserved3[4]);
+            reservedBits.Set(4, Reserved3[3]);
+            reservedBits.Set(5, Reserved3[2]);
+            reservedBits.Set(6, Reserved3[1]);
+            reservedBits.Set(7, Reserved3[0]);
             reservedBits.CopyTo(reservedByte, 0);
 
             /*for (int i = 0; i < 16; i++)
@@ -98,7 +98,7 @@ namespace Lifx_Lan
                 Console.WriteLine(protocolBits[i]);
             }*/
 
-            return Target.Concat(Reserved_1).Concat(reservedByte).Concat(sequenceByte).ToArray();
+            return Target.Concat(Reserved2).Concat(reservedByte).Concat(sequenceByte).ToArray();
         }
     }
 }

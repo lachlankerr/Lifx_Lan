@@ -41,6 +41,7 @@ namespace Lifx_Lan
 
         /// <summary>
         /// Message origin indicator: must be zero (0)
+        /// Also known as reserved1
         /// </summary>
         public BitArray Origin { get; } = new BitArray(2);
 

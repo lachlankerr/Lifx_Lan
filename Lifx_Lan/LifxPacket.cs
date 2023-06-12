@@ -31,16 +31,16 @@ namespace Lifx_Lan
         public ProtocolHeader protocolHeader;
         public Payload payload;
 
-        public LifxPacket(MessageType type, byte[] data)
+        public LifxPacket(Pkt_Type type, byte[] data)
         {
             frameAddress = new FrameAddress();
             protocolHeader = new ProtocolHeader(type);
 
             switch(type)
             {
-                case MessageType.GetService:
+                case Pkt_Type.GetService:
                     break;
-                case MessageType.SetPower:
+                case Pkt_Type.SetPower:
                     break;
             }
 
