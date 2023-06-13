@@ -36,11 +36,31 @@ namespace Lifx_Lan
             Pkt_Type = type;
         }
 
+        public ProtocolHeader(byte[] reserved4, Pkt_Type type, byte[] reserved5)
+        {
+            Reserved4 = reserved4;
+            Pkt_Type = type;
+            Reserved5 = reserved5;
+        }
+
         public byte[] ToBytes()
         {
             byte[] typeByte = BitConverter.GetBytes((ushort)Pkt_Type);
 
             return Reserved4.Concat(typeByte).Concat(Reserved5).ToArray();
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+                return false;
+            else
+            {
+                ProtocolHeader protocolHeader = (ProtocolHeader)obj;
+                return this.Reserved4.SequenceEqual(protocolHeader.Reserved4) &&
+                       this.Pkt_Type.Equals(protocolHeader.Pkt_Type) && 
+                       this.Reserved5.SequenceEqual(protocolHeader.Reserved5);
+            }
         }
     }
 }

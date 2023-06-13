@@ -67,6 +67,17 @@ namespace Lifx_Lan
             Tagged = tagged;
         }
 
+        public FrameHeader(UInt16 size, UInt16 protocol, bool addressable, bool tagged, byte origin, UInt32 source)
+        {
+            Size = size;
+            Protocol = protocol; 
+            Addressable = addressable; 
+            Tagged = tagged;
+            Origin = new BitArray(new byte[] { origin });
+            Origin.Length = 2; //necessary for equals() method to work
+            Source = source;
+        }
+
         public byte[] ToBytes()
         {
             byte[] sizeBytes = BitConverter.GetBytes(Size);
@@ -89,6 +100,22 @@ namespace Lifx_Lan
             }*/
 
             return sizeBytes.Concat(protocolBytes).Concat(sourceBytes).ToArray();
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+                return false;
+            else
+            {
+                FrameHeader frameHeader = (FrameHeader)obj;
+                return this.Size == frameHeader.Size &&
+                       this.Protocol == frameHeader.Protocol &&
+                       this.Addressable == frameHeader.Addressable &&
+                       this.Tagged == frameHeader.Tagged &&
+                       this.Origin.Xor(frameHeader.Origin).OfType<bool>().All(e => !e) &&
+                       this.Source == frameHeader.Source;
+            }
         }
     }
 }

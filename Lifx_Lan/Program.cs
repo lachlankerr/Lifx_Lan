@@ -22,6 +22,9 @@ namespace Lifx_Lan
             {
                 Decoder.IsValid(packet.ToBytes());
                 Decoder.PrintFields(packet.ToBytes());
+                //Decoder.IsValid(Decoder.ToLifxPacket(packet.ToBytes()).ToBytes());
+                //Decoder.PrintFields(Decoder.ToLifxPacket(packet.ToBytes()).ToBytes());
+                //Console.WriteLine("\nAre the packets the same? " + (Decoder.ToLifxPacket(packet.ToBytes()).Equals(packet)));
 
                 udpClient.Connect(IP, PORT);
                 udpClient.Send(packet.ToBytes(), packet.ToBytes().Length);

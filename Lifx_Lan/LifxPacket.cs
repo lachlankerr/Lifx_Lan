@@ -31,6 +31,17 @@ namespace Lifx_Lan
         public ProtocolHeader protocolHeader;
         public Payload payload;
 
+        public LifxPacket(UInt16 size, UInt16 protocol, bool addressable, bool tagged, byte origin, UInt32 source,
+                          byte[] target, byte[] reserved2, bool res_required, bool ack_required, byte[] reserved3, byte sequence,
+                          byte[] reserved4, Pkt_Type pkt_type, byte[] reserved5,
+                          byte[] payload)
+        {
+            this.frameHeader = new FrameHeader(size, protocol, addressable, tagged, origin, source);
+            this.frameAddress = new FrameAddress(target, reserved2, res_required, ack_required, reserved3, sequence);
+            this.protocolHeader = new ProtocolHeader(reserved4, pkt_type, reserved5);
+            this.payload = new Payload(payload);
+        }
+
         public LifxPacket(Pkt_Type type, byte[] data)
         {
             frameAddress = new FrameAddress();
@@ -51,6 +62,20 @@ namespace Lifx_Lan
         public byte[] ToBytes()
         {
             return frameHeader.ToBytes().Concat(frameAddress.ToBytes()).Concat(protocolHeader.ToBytes()).Concat(payload.ToBytes()).ToArray();
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if ((obj == null) || !this.GetType().Equals(obj.GetType())) 
+                return false;
+            else
+            {
+                LifxPacket packet = (LifxPacket)obj;
+                return this.frameHeader.Equals(packet.frameHeader) &&
+                       this.frameAddress.Equals(packet.frameAddress) &&
+                       this.protocolHeader.Equals(packet.protocolHeader) &&
+                       this.payload.Equals(packet.payload);
+            }
         }
     }
 }

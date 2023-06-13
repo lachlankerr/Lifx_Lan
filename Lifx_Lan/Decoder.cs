@@ -16,12 +16,12 @@ namespace Lifx_Lan
         /// <returns>True if it's a valid <see cref="LifxPacket"/></returns>
         public static bool IsValid(byte[] data)
         {
-            if (data.Length < 36)
-                throw new Exception("Not enough bytes for full header, packet size: " + data.Length);
+            if (data.Length < FrameHeader.MIN_SIZE)
+                throw new Exception("Not enough bytes for full header (" + FrameHeader.MIN_SIZE + "), packet size: " + data.Length);
             else if (GetSize(data) != data.Length)
                 throw new Exception("Size of packet does not match size field in frame header, packet size: " + data.Length + ", field size: " + GetSize(data));
-            else if (GetProtocol(data) != 1024)
-                throw new Exception("Protocol not 1024, value:" + GetProtocol(data));
+            else if (GetProtocol(data) != FrameHeader.PROTOCOL)
+                throw new Exception("Protocol not " + FrameHeader.PROTOCOL + ", value:" + GetProtocol(data));
             else if (GetOrigin(data) != 0)
                 throw new Exception("Origin not 0, value:" + GetProtocol(data));
             else if (GetTarget(data)[6] != 0 && GetTarget(data)[7] != 0)
@@ -132,6 +132,11 @@ namespace Lifx_Lan
             return data.Skip(34).Take(2).ToArray();
         }
 
+        public static byte[] GetPayload(byte[] data)
+        {
+            return data.Skip(FrameHeader.MIN_SIZE).ToArray();
+        }
+
         public static void PrintFields(byte[] data)
         {
             Console.WriteLine("");
@@ -150,6 +155,30 @@ namespace Lifx_Lan
             Console.WriteLine("Reserved4:\t" + BitConverter.ToString(GetReserved4(data)));
             Console.WriteLine("Pkt_Type:\t" + GetPkt_Type(data) + " (" + (ushort)GetPkt_Type(data) + ")");
             Console.WriteLine("Reserved5:\t" + BitConverter.ToString(GetReserved5(data)));
+            Console.WriteLine("Payload:\t" + BitConverter.ToString(GetPayload(data)));
+        }
+
+        public static LifxPacket ToLifxPacket(byte[] data)
+        {
+            if (!IsValid(data))
+                throw new Exception("Data not valid for a LifxPacket, see previous exception");
+            else
+                return new LifxPacket(GetSize(data),
+                                      GetProtocol(data),
+                                      GetAddressable(data),
+                                      GetTagged(data),
+                                      GetOrigin(data),
+                                      GetSource(data),
+                                      GetTarget(data),
+                                      GetReserved2(data),
+                                      GetRes_Required(data),
+                                      GetAck_Required(data),
+                                      GetReserved3(data),
+                                      GetSequence(data),
+                                      GetReserved4(data),
+                                      GetPkt_Type(data),
+                                      GetReserved5(data),
+                                      GetPayload(data));
         }
     }
 }

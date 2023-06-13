@@ -35,5 +35,16 @@ namespace Lifx_Lan
         {
             return Data;
         }
+
+        public override bool Equals(object? obj)
+        {
+            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+                return false;
+            else
+            {
+                Payload payload = (Payload)obj;
+                return this.Data.SequenceEqual(payload.Data);
+            }
+        }
     }
 }

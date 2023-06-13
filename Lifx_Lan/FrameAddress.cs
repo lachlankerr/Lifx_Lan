@@ -75,6 +75,17 @@ namespace Lifx_Lan
             Target = new byte[] { 0xD0, 0x73, 0xD5, 0x2D, 0x8D, 0xA2, 0x00, 0x00 };
         }
 
+        public FrameAddress(byte[] target, byte[] reserved2, bool res_required, bool ack_required, byte[] reserved3, byte sequence)
+        {
+            Target = target;
+            Reserved2 = reserved2;
+            Res_required = res_required;
+            Ack_required = ack_required;
+            Reserved3 = new BitArray(reserved3);
+            Reserved3.Length = 6; //necessary for equals() method to work
+            Sequence = sequence;
+        }
+
         public byte[] ToBytes()
         {
             byte[] reservedByte = new byte[1];
@@ -84,7 +95,8 @@ namespace Lifx_Lan
 
             reservedBits.Set(0, Res_required);
             reservedBits.Set(1, Ack_required);
-            reservedBits.Set(2, Reserved3[4]);
+            reservedBits.Set(2, Reserved3[5]);
+            reservedBits.Set(3, Reserved3[4]);
             reservedBits.Set(4, Reserved3[3]);
             reservedBits.Set(5, Reserved3[2]);
             reservedBits.Set(6, Reserved3[1]);
@@ -99,6 +111,22 @@ namespace Lifx_Lan
             }*/
 
             return Target.Concat(Reserved2).Concat(reservedByte).Concat(sequenceByte).ToArray();
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+                return false;
+            else
+            {
+                FrameAddress frameAddress = (FrameAddress)obj;
+                return this.Target.SequenceEqual(frameAddress.Target) &&
+                       this.Reserved2.SequenceEqual(frameAddress.Reserved2) &&
+                       this.Res_required == frameAddress.Res_required &&
+                       this.Ack_required == frameAddress.Ack_required &&
+                       this.Reserved3.Xor(frameAddress.Reserved3).OfType<bool>().All(e => !e) &&
+                       this.Sequence == frameAddress.Sequence;
+            }
         }
     }
 }
