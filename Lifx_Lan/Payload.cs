@@ -18,6 +18,11 @@ namespace Lifx_Lan
         /// </summary>
         public byte[] Data { get; } = new byte[0];
 
+        public Payload() 
+        {
+            
+        }
+
         /// <summary>
         /// 
         /// </summary>

@@ -31,6 +31,36 @@ namespace Lifx_Lan
         public ProtocolHeader protocolHeader;
         public Payload payload;
 
+        public LifxPacket(Pkt_Type pkt_type, bool tagged = false,
+                          UInt32 source = FrameHeader.DEFAULT_SOURCE, bool res_required = false, bool ack_required = false,
+                          byte sequence = 1)
+        {
+            this.frameHeader = new FrameHeader(FrameHeader.MIN_SIZE, tagged, source);
+            this.frameAddress = new FrameAddress(res_required, ack_required, sequence);
+            this.protocolHeader = new ProtocolHeader(pkt_type);
+            this.payload = new Payload();
+        }
+
+        public LifxPacket(byte[] target, Pkt_Type pkt_type, bool tagged = false,
+                          UInt32 source = FrameHeader.DEFAULT_SOURCE, bool res_required = false, bool ack_required = false,
+                          byte sequence = 1)
+        {
+            this.frameHeader = new FrameHeader(FrameHeader.MIN_SIZE, tagged, source);
+            this.frameAddress = new FrameAddress(target, res_required, ack_required, sequence);
+            this.protocolHeader = new ProtocolHeader(pkt_type);
+            this.payload = new Payload();
+        }
+
+        public LifxPacket(byte[] target, Pkt_Type pkt_type, byte[] payload, bool tagged = false, 
+                          UInt32 source = FrameHeader.DEFAULT_SOURCE, bool res_required = false, bool ack_required = false, 
+                          byte sequence = 1)
+        {
+            this.frameHeader = new FrameHeader((ushort)(FrameHeader.MIN_SIZE + payload.Length), tagged, source);
+            this.frameAddress = new FrameAddress(target, res_required, ack_required, sequence);
+            this.protocolHeader = new ProtocolHeader(pkt_type);
+            this.payload = new Payload(payload);
+        }
+
         public LifxPacket(UInt16 size, UInt16 protocol, bool addressable, bool tagged, byte origin, UInt32 source,
                           byte[] target, byte[] reserved2, bool res_required, bool ack_required, byte[] reserved3, byte sequence,
                           byte[] reserved4, Pkt_Type pkt_type, byte[] reserved5,
@@ -42,7 +72,7 @@ namespace Lifx_Lan
             this.payload = new Payload(payload);
         }
 
-        public LifxPacket(Pkt_Type type, byte[] data)
+        /*public LifxPacket(Pkt_Type type, byte[] data)
         {
             frameAddress = new FrameAddress();
             protocolHeader = new ProtocolHeader(type);
@@ -57,7 +87,7 @@ namespace Lifx_Lan
 
             payload = new Payload(data);
             frameHeader = new FrameHeader((ushort)(Convert.ToUInt16(data.Length) + FrameHeader.MIN_SIZE));
-        }
+        }*/
 
         public byte[] ToBytes()
         {

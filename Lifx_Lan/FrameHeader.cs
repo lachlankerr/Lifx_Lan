@@ -14,6 +14,7 @@ namespace Lifx_Lan
     {
         public const UInt16 MIN_SIZE = 36;
         public const UInt16 PROTOCOL = 1024;
+        public const UInt32 DEFAULT_SOURCE = 2;
 
         /// <summary>
         /// Size of entire message in bytes including this field.
@@ -54,17 +55,18 @@ namespace Lifx_Lan
         /// In some versions of the firmware a source value of 1 will be ignored. 
         /// If you set source to 0 then the device may broadcast the reply on port 56700 which can be received by all clients on the same subnet and may not be the port on which your client is listening for replies.
         /// </summary>
-        public UInt32 Source { get; } = 2;
+        public UInt32 Source { get; } = DEFAULT_SOURCE;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="size">Defaults to 36</param>
         /// <param name="tagged">Defaults to false</param>
-        public FrameHeader(UInt16 size = MIN_SIZE, bool tagged = false) 
+        public FrameHeader(UInt16 size = MIN_SIZE, bool tagged = false, UInt32 source = DEFAULT_SOURCE) 
         {
             Size = size;
             Tagged = tagged;
+            Source = source;
         }
 
         public FrameHeader(UInt16 size, UInt16 protocol, bool addressable, bool tagged, byte origin, UInt32 source)

@@ -67,12 +67,19 @@ namespace Lifx_Lan
         /// </summary>
         public byte Sequence { get; } = 1;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public FrameAddress() 
-        { 
-            Target = new byte[] { 0xD0, 0x73, 0xD5, 0x2D, 0x8D, 0xA2, 0x00, 0x00 };
+        public FrameAddress(bool res_required = false, bool ack_required = false, byte sequence = 1)
+        {
+            Res_required = res_required;
+            Ack_required = ack_required;
+            Sequence = sequence;
+        }
+
+        public FrameAddress(byte[] target, bool res_required = false, bool ack_required = false, byte sequence = 1) 
+        {
+            Target = target;
+            Res_required = res_required;
+            Ack_required = ack_required;
+            Sequence = sequence;
         }
 
         public FrameAddress(byte[] target, byte[] reserved2, bool res_required, bool ack_required, byte[] reserved3, byte sequence)

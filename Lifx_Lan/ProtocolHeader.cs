@@ -31,15 +31,15 @@ namespace Lifx_Lan
         /// <summary>
         /// 
         /// </summary>
-        public ProtocolHeader(Pkt_Type type) 
+        public ProtocolHeader(Pkt_Type pkt_type) 
         {
-            Pkt_Type = type;
+            Pkt_Type = pkt_type;
         }
 
-        public ProtocolHeader(byte[] reserved4, Pkt_Type type, byte[] reserved5)
+        public ProtocolHeader(byte[] reserved4, Pkt_Type pkt_type, byte[] reserved5)
         {
             Reserved4 = reserved4;
-            Pkt_Type = type;
+            Pkt_Type = pkt_type;
             Reserved5 = reserved5;
         }
 
