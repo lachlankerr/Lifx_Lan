@@ -26,11 +26,11 @@ namespace Lifx_Lan
                 throw new Exception("Origin not 0, value:" + GetProtocol(data));
             else if (GetTarget(data)[6] != 0 && GetTarget(data)[7] != 0)
                 throw new Exception("Last two bytes in target aren't 0, full value:" + GetTarget(data));
-            //else if (GetTagged(data) == false && GetTarget(data)[0] != 0xD0 && GetTarget(data)[1] != 0x73 && GetTarget(data)[1] != 0xD5)
-            //    throw new Exception("Target is not of the form D0 73 D5 xx xx xx , full value:" + GetTarget(data));
-            //else if ((GetTagged(data) == true && !(GetTarget(data)[0] == 0 && GetTarget(data)[1] == 0 && GetTarget(data)[2] == 0 && GetTarget(data)[3] == 0 && GetTarget(data)[4] == 0 && GetTarget(data)[5] == 0)) ||
-            //         (GetTagged(data) == false && (GetTarget(data)[0] == 0 && GetTarget(data)[1] == 0 && GetTarget(data)[2] == 0 && GetTarget(data)[3] == 0 && GetTarget(data)[4] == 0 && GetTarget(data)[5] == 0)))
-            //    throw new Exception("Broadcast message with incorrect values, full value:" + GetTarget(data) + ", tagged: " + GetTagged(data));
+            else if (GetTagged(data) == false && GetTarget(data)[0] != 0xD0 && GetTarget(data)[1] != 0x73 && GetTarget(data)[1] != 0xD5)
+                throw new Exception("Target is not of the form D0 73 D5 xx xx xx , full value:" + GetTarget(data));
+            else if ((GetTagged(data) == true && !(GetTarget(data)[0] == 0 && GetTarget(data)[1] == 0 && GetTarget(data)[2] == 0 && GetTarget(data)[3] == 0 && GetTarget(data)[4] == 0 && GetTarget(data)[5] == 0)) ||
+                     (GetTagged(data) == false && (GetTarget(data)[0] == 0 && GetTarget(data)[1] == 0 && GetTarget(data)[2] == 0 && GetTarget(data)[3] == 0 && GetTarget(data)[4] == 0 && GetTarget(data)[5] == 0)))
+                throw new Exception("Broadcast message with incorrect values, full value:" + GetTarget(data) + ", tagged: " + GetTagged(data));
             else
                 return true;
         }

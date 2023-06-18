@@ -22,6 +22,8 @@ namespace Lifx_Lan
                                                    payload: new byte[2] { 0xFF, 0xFF },
                                                    ack_required: true);
 
+            //Decoder.PrintFields(new byte[] { 0x24, 0x00, 0x00, 0x34, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00 });
+
             Lan lan = new Lan(ONE_SECOND * 10);
 
             //lan.SendPacket(testPacket, "192.168.10.25", printMessages: true);
@@ -37,17 +39,33 @@ namespace Lifx_Lan
         public Lan(int timeout)
         {
             udpClient = new UdpClient(DEFAULT_PORT);
+            udpClient.EnableBroadcast = true;
             udpClient.Client.SendTimeout = timeout;
+            //udpClient.Client.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.Broadcast, true);
         }
 
         public void StartDiscovery()
         {
             //construct discovery packet
-            LifxPacket discoveryPacket = new LifxPacket(Pkt_Type.GetService, false);
+            LifxPacket discoveryPacket = new LifxPacket(Pkt_Type.GetService, true);
 
-            SendPacket(discoveryPacket, "192.168.10.255", printMessages: true);
+            //SendPacket(discoveryPacket, new IPEndPoint(0xFF0AA8C0, DEFAULT_PORT), printMessages: true);
+            SendPacket(discoveryPacket, new IPEndPoint(IPAddress.Parse("192.168.10.255"), DEFAULT_PORT), printMessages: true);
 
-            ReceivePacket(printMessages: true); // why won't this receive? wrong port ??
+            //System.Threading.Thread.Sleep(500);
+
+            //SendPacket(discoveryPacket, "192.168.10.255", printMessages: true);
+
+            ReceivePacket(printMessages: true); 
+            ReceivePacket(printMessages: true); 
+            ReceivePacket(printMessages: true); 
+            ReceivePacket(printMessages: true); 
+            ReceivePacket(printMessages: true);
+            ReceivePacket(printMessages: true);
+            ReceivePacket(printMessages: true);
+            ReceivePacket(printMessages: true);
+            ReceivePacket(printMessages: true);
+            ReceivePacket(printMessages: true);
         }
 
         /// <summary>
@@ -58,19 +76,20 @@ namespace Lifx_Lan
         /// <param name="port">The port number we are sending our packet on</param>
         /// <param name="printMessages">Whether to print any text or not</param>
         /// <returns>The number of bytes sent</returns>
-        public int SendPacket(LifxPacket packet, string ip, int port = DEFAULT_PORT, bool printMessages = false)
+        public int SendPacket(LifxPacket packet, IPEndPoint addr, bool printMessages = false)
         {
             if (Decoder.IsValid(packet.ToBytes())) //no point sending useless data that might damage our devices
             {
                 try
                 {
-                    udpClient.Connect(ip, port);
-                    int bytesSent = udpClient.Send(packet.ToBytes(), packet.ToBytes().Length); //better to use length in case there's an error with our code
+                    //udpClient.Connect(ip, port); //this was the culprit, was only looking for responses from our broadcast address, which is wrong since any responses would have the ip of the device not broadcast
+                    int bytesSent = udpClient.Send(packet.ToBytes(), packet.ToBytes().Length, addr);
+                    //udpClient.Send(packet.ToBytes(), packet.ToBytes().Length, addr);
 
 
                     if (printMessages)
                     {
-                        Console.WriteLine("Sent to " + ip + " on port " + port + ":");
+                        Console.WriteLine("Sent to " + addr.Address + " on port " + addr.Port + ":");
                         Console.WriteLine(BitConverter.ToString(packet.ToBytes()));
                         Console.WriteLine();
                         Decoder.PrintFields(packet.ToBytes());
@@ -97,6 +116,7 @@ namespace Lifx_Lan
             LifxPacket? receivedPacket = null;
             try
             {
+                Console.WriteLine("\nWaiting for response...");
                 IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
 
                 byte[] receivedBytes = udpClient.Receive(ref RemoteIpEndPoint);
