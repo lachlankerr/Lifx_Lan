@@ -24,12 +24,13 @@ namespace Lifx_Lan
 
             //Decoder.PrintFields(new byte[] { 0x24, 0x00, 0x00, 0x34, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00 });
 
-            Lan lan = new Lan(ONE_SECOND * 10);
+            //Lan lan = new Lan(ONE_SECOND * 10);
 
-            //lan.SendPacket(testPacket, "192.168.10.25", printMessages: true);
+            //lan.SendPacket(testPacket, new IPEndPoint(IPAddress.Parse("192.168.10.25"), DEFAULT_PORT), printMessages: true);
             //lan.ReceivePacket(printMessages: true);
 
-            lan.StartDiscovery();
+            //lan.StartDiscovery();
+            Console.WriteLine(new Product(1, 30, 3, 90));
         }
 
         /// <summary>
