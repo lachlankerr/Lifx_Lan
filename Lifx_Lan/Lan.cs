@@ -44,7 +44,13 @@ namespace Lifx_Lan
             //udpClient.Client.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.Broadcast, true);
         }
 
-        public void StartDiscovery()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="timeoutPerRun">How long to wait for responses in milliseconds until starting next run</param>
+        /// <param name="numRuns">The number of discovery packets to run if we have not found numDevices yet</param>
+        /// <param name="numDevices">The total number of devices we are looking for, set to zero if it is an unknown number</param>
+        public void StartDiscovery(int timeoutPerRun = ONE_SECOND, int numRuns = 3, int numDevices = 0)
         {
             //construct discovery packet
             LifxPacket discoveryPacket = new LifxPacket(Pkt_Type.GetService, true);
