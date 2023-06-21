@@ -24,13 +24,13 @@ namespace Lifx_Lan
 
             //Decoder.PrintFields(new byte[] { 0x24, 0x00, 0x00, 0x34, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00 });
 
-            //Lan lan = new Lan(ONE_SECOND * 10);
+            Lan lan = new Lan(ONE_SECOND * 10);
 
-            //lan.SendPacket(testPacket, new IPEndPoint(IPAddress.Parse("192.168.10.25"), DEFAULT_PORT), printMessages: true);
-            //lan.ReceivePacket(printMessages: true);
+            lan.SendPacket(testPacket, new IPEndPoint(IPAddress.Parse("192.168.10.25"), DEFAULT_PORT), printMessages: true);
+            lan.ReceivePacket(printMessages: true);
 
             //lan.StartDiscovery();
-            Console.WriteLine(new Product(1, 30, 3, 90));
+            //Console.WriteLine(new Product(1, 30, 3, 90));
         }
 
         /// <summary>
@@ -42,6 +42,7 @@ namespace Lifx_Lan
             udpClient = new UdpClient(DEFAULT_PORT);
             udpClient.EnableBroadcast = true;
             udpClient.Client.SendTimeout = timeout;
+            udpClient.Client.ReceiveTimeout = timeout;
             //udpClient.Client.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.Broadcast, true);
         }
 
@@ -55,24 +56,31 @@ namespace Lifx_Lan
         {
             //construct discovery packet
             LifxPacket discoveryPacket = new LifxPacket(Pkt_Type.GetService, true);
+            for (int r = 0; r < numRuns; r++)
+            {
+                SendPacket(discoveryPacket, new IPEndPoint(IPAddress.Parse("192.168.10.255"), DEFAULT_PORT), printMessages: true);
 
-            //SendPacket(discoveryPacket, new IPEndPoint(0xFF0AA8C0, DEFAULT_PORT), printMessages: true);
-            SendPacket(discoveryPacket, new IPEndPoint(IPAddress.Parse("192.168.10.255"), DEFAULT_PORT), printMessages: true);
 
-            //System.Threading.Thread.Sleep(500);
 
-            //SendPacket(discoveryPacket, "192.168.10.255", printMessages: true);
+                //byte[] receivedBytes = udpClient.Receive(ref RemoteIpEndPoint);
+                //udpClient.ReceiveAsync
+                //System.Threading.Thread.Sleep(500);
 
-            ReceivePacket(printMessages: true); 
-            ReceivePacket(printMessages: true); 
-            ReceivePacket(printMessages: true); 
-            ReceivePacket(printMessages: true); 
-            ReceivePacket(printMessages: true);
-            ReceivePacket(printMessages: true);
-            ReceivePacket(printMessages: true);
-            ReceivePacket(printMessages: true);
-            ReceivePacket(printMessages: true);
-            ReceivePacket(printMessages: true);
+                //SendPacket(discoveryPacket, "192.168.10.255", printMessages: true);
+
+
+
+                ReceivePacket(printMessages: true);
+                ReceivePacket(printMessages: true);
+                ReceivePacket(printMessages: true);
+                ReceivePacket(printMessages: true);
+                ReceivePacket(printMessages: true);
+                ReceivePacket(printMessages: true);
+                ReceivePacket(printMessages: true);
+                ReceivePacket(printMessages: true);
+                ReceivePacket(printMessages: true);
+                ReceivePacket(printMessages: true);
+            }
         }
 
         /// <summary>
