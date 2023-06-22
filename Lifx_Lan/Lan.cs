@@ -109,12 +109,12 @@ namespace Lifx_Lan
         /// <param name="timeoutPerRun">How long to wait for responses in milliseconds until starting next run</param>
         /// <param name="maxRuns">The maximum number of discovery packets to run if we have not found numDevices yet</param>
         /// <param name="numDevices">The total number of devices we are looking for, set to zero if it is an unknown number</param>
-        public List<Device> Discovery(int timeoutPerRun = ONE_SECOND, int maxRuns = 5, int numDevices = 0, bool printMessages = false)
+        public List<NetworkInfo> Discovery(int timeoutPerRun = ONE_SECOND, int maxRuns = 5, int numDevices = 0, bool printMessages = false)
         {
             if (printMessages)
                 Console.WriteLine($"Looking for {numDevices} devices, max amount of runs is {maxRuns}, timeout per run is {timeoutPerRun} milliseconds");
 
-            List<Device> devices = new List<Device>();
+            List<NetworkInfo> networkInfos = new List<NetworkInfo>();
             IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
             Stopwatch stopwatch = new Stopwatch();
 
@@ -125,7 +125,7 @@ namespace Lifx_Lan
                 SendPacket(discoveryPacket, new IPEndPoint(GetBroadcastAddress(GetLocalIP(), GetSubnetMask(GetLocalIP())), DEFAULT_PORT), printMessages: false);
                 stopwatch.Start();
 
-                while (devices.Count < numDevices && stopwatch.ElapsedMilliseconds < timeoutPerRun)
+                while (networkInfos.Count < numDevices && stopwatch.ElapsedMilliseconds < timeoutPerRun)
                 {
                     udpClient.Client.ReceiveTimeout = Math.Abs(timeoutPerRun - (int)stopwatch.ElapsedMilliseconds);
                     byte[] receivedBytes = new byte[0];
@@ -161,16 +161,16 @@ namespace Lifx_Lan
                             //Console.WriteLine(stateService.Service);
                             //Console.WriteLine(stateService.Port);
 
-                            Device newDevice = new Device(receivedPacket.frameAddress.Target.Take(6).ToArray(), RemoteIpEndPoint.Address, RemoteIpEndPoint.Port);
+                            NetworkInfo newNetworkInfo = new NetworkInfo(receivedPacket.frameAddress.Target.Take(6).ToArray(), RemoteIpEndPoint.Address, RemoteIpEndPoint.Port);
 
-                            if (!devices.Contains(newDevice))
-                                devices.Add(newDevice);
+                            if (!networkInfos.Contains(newNetworkInfo))
+                                networkInfos.Add(newNetworkInfo);
                         }
                     }
                 }
                 if (printMessages)
-                    Console.WriteLine($"Run {r+1}, devices found so far: {devices.Count}");
-                if (devices.Count >= numDevices) //
+                    Console.WriteLine($"Run {r+1}, devices found so far: {networkInfos.Count}");
+                if (networkInfos.Count >= numDevices) //
                     break;
             }
 
@@ -178,13 +178,13 @@ namespace Lifx_Lan
                 Console.WriteLine();
 
             if (printMessages)
-                foreach (Device device in devices)
+                foreach (NetworkInfo networkInfo in networkInfos)
                 {
-                    Console.WriteLine(device);
+                    Console.WriteLine(networkInfo);
                     Console.WriteLine();
                 }
 
-            return devices;
+            return networkInfos;
         }
 
         /// <summary>
