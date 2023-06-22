@@ -32,7 +32,7 @@ namespace Lifx_Lan
             //lan.SendPacket(testPacket, new IPEndPoint(IPAddress.Parse("192.168.10.25"), DEFAULT_PORT), printMessages: true);
             //lan.ReceivePacket(printMessages: true);
 
-            lan.StartDiscovery(ONE_SECOND * 3, 3, 5);
+            lan.Discovery(ONE_SECOND * 1, 5, 5, true);
             //Console.WriteLine(new Product(1, 30, 3, 90));
         }
 
@@ -107,19 +107,22 @@ namespace Lifx_Lan
         /// 
         /// </summary>
         /// <param name="timeoutPerRun">How long to wait for responses in milliseconds until starting next run</param>
-        /// <param name="numRuns">The number of discovery packets to run if we have not found numDevices yet</param>
+        /// <param name="maxRuns">The maximum number of discovery packets to run if we have not found numDevices yet</param>
         /// <param name="numDevices">The total number of devices we are looking for, set to zero if it is an unknown number</param>
-        public void StartDiscovery(int timeoutPerRun = ONE_SECOND, int numRuns = 3, int numDevices = 0)
+        public List<Device> Discovery(int timeoutPerRun = ONE_SECOND, int maxRuns = 5, int numDevices = 0, bool printMessages = false)
         {
+            if (printMessages)
+                Console.WriteLine($"Looking for {numDevices} devices, max amount of runs is {maxRuns}, timeout per run is {timeoutPerRun} milliseconds");
+
             List<Device> devices = new List<Device>();
             IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
             Stopwatch stopwatch = new Stopwatch();
 
             LifxPacket discoveryPacket = new LifxPacket(Pkt_Type.GetService, true);
-            for (int r = 0; r < numRuns; r++)
+            for (int r = 0; r < maxRuns; r++)
             {
                 stopwatch.Restart();
-                SendPacket(discoveryPacket, new IPEndPoint(GetBroadcastAddress(GetLocalIP(), GetSubnetMask(GetLocalIP())), DEFAULT_PORT), printMessages: true);
+                SendPacket(discoveryPacket, new IPEndPoint(GetBroadcastAddress(GetLocalIP(), GetSubnetMask(GetLocalIP())), DEFAULT_PORT), printMessages: false);
                 stopwatch.Start();
 
                 while (devices.Count < numDevices && stopwatch.ElapsedMilliseconds < timeoutPerRun)
@@ -136,7 +139,18 @@ namespace Lifx_Lan
                             throw;
                     }
 
-                    if (Decoder.IsValid(receivedBytes))
+                    bool isValid;
+
+                    try
+                    {
+                        isValid = Decoder.IsValid(receivedBytes);
+                    }
+                    catch 
+                    {
+                        isValid = false;
+                    }
+
+                    if (isValid)
                     {
                         LifxPacket receivedPacket = Decoder.ToLifxPacket(receivedBytes);
 
@@ -144,8 +158,8 @@ namespace Lifx_Lan
                         {
                             //Decoder.PrintFields(receivedBytes);
                             StateService stateService = new StateService(receivedPacket.payload.Data);
-                            Console.WriteLine(stateService.Service);
-                            Console.WriteLine(stateService.Port);
+                            //Console.WriteLine(stateService.Service);
+                            //Console.WriteLine(stateService.Port);
 
                             Device newDevice = new Device(receivedPacket.frameAddress.Target.Take(6).ToArray(), RemoteIpEndPoint.Address, RemoteIpEndPoint.Port);
 
@@ -154,13 +168,23 @@ namespace Lifx_Lan
                         }
                     }
                 }
+                if (printMessages)
+                    Console.WriteLine($"Run {r+1}, devices found so far: {devices.Count}");
+                if (devices.Count >= numDevices) //
+                    break;
             }
 
-            foreach (Device device in devices)
-            {
-                Console.WriteLine(device);
+            if (printMessages)
                 Console.WriteLine();
-            }
+
+            if (printMessages)
+                foreach (Device device in devices)
+                {
+                    Console.WriteLine(device);
+                    Console.WriteLine();
+                }
+
+            return devices;
         }
 
         /// <summary>
