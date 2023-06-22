@@ -59,6 +59,15 @@ namespace Lifx_Lan
             return localIP;
         }
 
+        public static IPAddress GetBroadcastAddress(IPAddress address, IPAddress mask)
+        {
+            uint ipAddress = BitConverter.ToUInt32(address.GetAddressBytes(), 0);
+            uint ipMaskV4 = BitConverter.ToUInt32(mask.GetAddressBytes(), 0);
+            uint broadCastIpAddress = ipAddress | ~ipMaskV4;
+
+            return new IPAddress(BitConverter.GetBytes(broadCastIpAddress));
+        }
+
         /// <summary>
         /// 
         /// </summary>
