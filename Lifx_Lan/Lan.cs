@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 
@@ -17,7 +18,6 @@ namespace Lifx_Lan
 
         static void Main(string[] args)
         {
-            Console.WriteLine(GetLocalIP());
             LifxPacket testPacket = new LifxPacket(target: new byte[] { 0xD0, 0x73, 0xD5, 0x2D, 0x8D, 0xA2, 0x00, 0x00 },
                                                    pkt_type: Pkt_Type.SetPower, 
                                                    payload: new byte[2] { 0xFF, 0xFF },
@@ -27,11 +27,11 @@ namespace Lifx_Lan
 
             Lan lan = new Lan(ONE_SECOND * 10);
 
-            lan.SendPacket(testPacket, new IPEndPoint(IPAddress.Parse("192.168.10.25"), DEFAULT_PORT), printMessages: true);
-            lan.ReceivePacket(printMessages: true);
+            //lan.SendPacket(testPacket, new IPEndPoint(IPAddress.Parse("192.168.10.25"), DEFAULT_PORT), printMessages: true);
+            //lan.ReceivePacket(printMessages: true);
 
-            //lan.StartDiscovery();
-            //Console.WriteLine(new Product(1, 30, 3, 90));
+            lan.StartDiscovery();
+            Console.WriteLine(new Product(1, 30, 3, 90));
         }
 
         /// <summary>
@@ -47,16 +47,32 @@ namespace Lifx_Lan
             //udpClient.Client.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.Broadcast, true);
         }
 
-        public static string GetLocalIP()
+        public static IPAddress GetLocalIP()
         {
-            string localIP;
             using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
             {
                 socket.Connect("8.8.8.8", 65530);
                 IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint ?? throw new Exception("Could not get localEndPoint");
-                localIP = endPoint.Address.ToString();
+                return endPoint.Address;
             }
-            return localIP;
+        }
+
+        public static IPAddress GetSubnetMask(IPAddress address)
+        {
+            foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                foreach (UnicastIPAddressInformation unicastIPAddressInformation in adapter.GetIPProperties().UnicastAddresses)
+                {
+                    if (unicastIPAddressInformation.Address.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        if (address.Equals(unicastIPAddressInformation.Address))
+                        {
+                            return unicastIPAddressInformation.IPv4Mask;
+                        }
+                    }
+                }
+            }
+            throw new ArgumentException(string.Format("Can't find subnetmask for IP address '{0}'", address));
         }
 
         public static IPAddress GetBroadcastAddress(IPAddress address, IPAddress mask)
@@ -80,7 +96,7 @@ namespace Lifx_Lan
             LifxPacket discoveryPacket = new LifxPacket(Pkt_Type.GetService, true);
             for (int r = 0; r < numRuns; r++)
             {
-                SendPacket(discoveryPacket, new IPEndPoint(IPAddress.Parse("192.168.10.255"), DEFAULT_PORT), printMessages: true);
+                SendPacket(discoveryPacket, new IPEndPoint(GetBroadcastAddress(GetLocalIP(), GetSubnetMask(GetLocalIP())), DEFAULT_PORT), printMessages: true);
 
 
 
