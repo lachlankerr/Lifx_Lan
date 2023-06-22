@@ -72,23 +72,6 @@ namespace Lifx_Lan
             this.payload = new Payload(payload);
         }
 
-        /*public LifxPacket(Pkt_Type type, byte[] data)
-        {
-            frameAddress = new FrameAddress();
-            protocolHeader = new ProtocolHeader(type);
-
-            switch(type)
-            {
-                case Pkt_Type.GetService:
-                    break;
-                case Pkt_Type.SetPower:
-                    break;
-            }
-
-            payload = new Payload(data);
-            frameHeader = new FrameHeader((ushort)(Convert.ToUInt16(data.Length) + FrameHeader.MIN_SIZE));
-        }*/
-
         public byte[] ToBytes()
         {
             return frameHeader.ToBytes().Concat(frameAddress.ToBytes()).Concat(protocolHeader.ToBytes()).Concat(payload.ToBytes()).ToArray();

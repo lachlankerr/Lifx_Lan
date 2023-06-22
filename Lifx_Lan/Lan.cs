@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace Lifx_Lan
 {
@@ -30,8 +32,8 @@ namespace Lifx_Lan
             //lan.SendPacket(testPacket, new IPEndPoint(IPAddress.Parse("192.168.10.25"), DEFAULT_PORT), printMessages: true);
             //lan.ReceivePacket(printMessages: true);
 
-            lan.StartDiscovery();
-            Console.WriteLine(new Product(1, 30, 3, 90));
+            lan.StartDiscovery(ONE_SECOND * 3, 3, 5);
+            //Console.WriteLine(new Product(1, 30, 3, 90));
         }
 
         /// <summary>
@@ -111,36 +113,53 @@ namespace Lifx_Lan
         {
             List<Device> devices = new List<Device>();
             IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            Stopwatch stopwatch = new Stopwatch();
 
-            LifxPacket discoveryPacket = new LifxPacket(Pkt_Type.GetService, true);//construct discovery packet
+            LifxPacket discoveryPacket = new LifxPacket(Pkt_Type.GetService, true);
             for (int r = 0; r < numRuns; r++)
             {
+                stopwatch.Restart();
                 SendPacket(discoveryPacket, new IPEndPoint(GetBroadcastAddress(GetLocalIP(), GetSubnetMask(GetLocalIP())), DEFAULT_PORT), printMessages: true);
+                stopwatch.Start();
 
-                byte[] receivedBytes = udpClient.Receive(ref RemoteIpEndPoint);
-
-                // Uses the IPEndPoint object to determine which of these two hosts responded.
-
-
-                if (Decoder.IsValid(receivedBytes))
+                while (devices.Count < numDevices && stopwatch.ElapsedMilliseconds < timeoutPerRun)
                 {
-                    LifxPacket receivedPacket = Decoder.ToLifxPacket(receivedBytes);
-
-                    if (receivedPacket.protocolHeader.Pkt_Type == Pkt_Type.StateService) 
+                    udpClient.Client.ReceiveTimeout = Math.Abs(timeoutPerRun - (int)stopwatch.ElapsedMilliseconds);
+                    byte[] receivedBytes = new byte[0];
+                    try
                     {
-                        StateService stateService = new StateService(receivedPacket.payload.Data);
-                        Console.WriteLine(stateService.Service);
-                        Console.WriteLine(stateService.Port);
+                        receivedBytes = udpClient.Receive(ref RemoteIpEndPoint);
+                    }
+                    catch (SocketException ex) 
+                    {
+                        if (ex.SocketErrorCode != SocketError.TimedOut)
+                            throw;
                     }
 
-                    Console.WriteLine();
-                    Console.WriteLine("Received:");
-                    Console.WriteLine(BitConverter.ToString(receivedBytes));
-                    Console.WriteLine();
-                    Decoder.PrintFields(receivedBytes);
-                    Console.WriteLine();
-                    Console.WriteLine("This message was sent from " + RemoteIpEndPoint.Address.ToString() + " on their port number " + RemoteIpEndPoint.Port.ToString());
+                    if (Decoder.IsValid(receivedBytes))
+                    {
+                        LifxPacket receivedPacket = Decoder.ToLifxPacket(receivedBytes);
+
+                        if (receivedPacket.protocolHeader.Pkt_Type == Pkt_Type.StateService)
+                        {
+                            //Decoder.PrintFields(receivedBytes);
+                            StateService stateService = new StateService(receivedPacket.payload.Data);
+                            Console.WriteLine(stateService.Service);
+                            Console.WriteLine(stateService.Port);
+
+                            Device newDevice = new Device(receivedPacket.frameAddress.Target.Take(6).ToArray(), RemoteIpEndPoint.Address, RemoteIpEndPoint.Port);
+
+                            if (!devices.Contains(newDevice))
+                                devices.Add(newDevice);
+                        }
+                    }
                 }
+            }
+
+            foreach (Device device in devices)
+            {
+                Console.WriteLine(device);
+                Console.WriteLine();
             }
         }
 
