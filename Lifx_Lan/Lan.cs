@@ -47,6 +47,11 @@ namespace Lifx_Lan
             //udpClient.Client.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.Broadcast, true);
         }
 
+        /// <summary>
+        /// https://stackoverflow.com/a/27376368
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public static IPAddress GetLocalIP()
         {
             using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
@@ -57,6 +62,12 @@ namespace Lifx_Lan
             }
         }
 
+        /// <summary>
+        /// http://www.java2s.com/Code/CSharp/Network/GetSubnetMask.htm
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public static IPAddress GetSubnetMask(IPAddress address)
         {
             foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
@@ -75,6 +86,12 @@ namespace Lifx_Lan
             throw new ArgumentException(string.Format("Can't find subnetmask for IP address '{0}'", address));
         }
 
+        /// <summary>
+        /// https://stackoverflow.com/a/39338188
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="mask"></param>
+        /// <returns></returns>
         public static IPAddress GetBroadcastAddress(IPAddress address, IPAddress mask)
         {
             uint ipAddress = BitConverter.ToUInt32(address.GetAddressBytes(), 0);
