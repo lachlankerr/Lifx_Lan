@@ -17,6 +17,7 @@ namespace Lifx_Lan
 
         static void Main(string[] args)
         {
+            Console.WriteLine(GetLocalIP());
             LifxPacket testPacket = new LifxPacket(target: new byte[] { 0xD0, 0x73, 0xD5, 0x2D, 0x8D, 0xA2, 0x00, 0x00 },
                                                    pkt_type: Pkt_Type.SetPower, 
                                                    payload: new byte[2] { 0xFF, 0xFF },
@@ -44,6 +45,18 @@ namespace Lifx_Lan
             udpClient.Client.SendTimeout = timeout;
             udpClient.Client.ReceiveTimeout = timeout;
             //udpClient.Client.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.Broadcast, true);
+        }
+
+        public static string GetLocalIP()
+        {
+            string localIP;
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+            {
+                socket.Connect("8.8.8.8", 65530);
+                IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint ?? throw new Exception("Could not get localEndPoint");
+                localIP = endPoint.Address.ToString();
+            }
+            return localIP;
         }
 
         /// <summary>
