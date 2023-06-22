@@ -62,5 +62,10 @@ namespace Lifx_Lan
                        this.Reserved5.SequenceEqual(protocolHeader.Reserved5);
             }
         }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Reserved4, Pkt_Type, Reserved5);
+        }
     }
 }

@@ -42,5 +42,41 @@ namespace Lifx_Lan
     Temperature Range: {temperature_range[0]} - {temperature_range[1]}
     Extended Multizone: {extended_multizone}";
         }
+
+        public override bool Equals(object? obj)
+        {
+            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+                return false;
+            else
+            {
+                Features features = (Features)obj;
+                return this.hev == features.hev &&
+                       this.color == features.color &&
+                       this.chain == features.chain &&
+                       this.matrix == features.matrix &&
+                       this.relays == features.relays &&
+                       this.buttons == features.buttons &&
+                       this.infrared == features.infrared &&
+                       this.multizone == features.multizone &&
+                       this.temperature_range.SequenceEqual(features.temperature_range) && 
+                       this.extended_multizone == features.extended_multizone;
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(hev);
+            hash.Add(color);
+            hash.Add(chain);
+            hash.Add(matrix);
+            hash.Add(relays);
+            hash.Add(buttons);
+            hash.Add(infrared);
+            hash.Add(multizone);
+            hash.Add(temperature_range);
+            hash.Add(extended_multizone);
+            return hash.ToHashCode();
+        }
     }
 }

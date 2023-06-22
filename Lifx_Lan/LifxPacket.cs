@@ -107,5 +107,10 @@ namespace Lifx_Lan
                        this.payload.Equals(packet.payload);
             }
         }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(frameHeader, frameAddress, protocolHeader, payload);
+        }
     }
 }

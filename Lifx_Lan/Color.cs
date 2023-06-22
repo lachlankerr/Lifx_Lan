@@ -36,9 +36,39 @@ namespace Lifx_Lan
         /// </summary>
         public UInt16 Kelvin { get; } = 0;
 
-        public Color() 
+        public Color(UInt16 hue, UInt16 saturation, UInt16 brightness, UInt16 kelvin) 
         { 
+            Hue = hue;
+            Saturation = saturation;
+            Brightness = brightness;
+            Kelvin = kelvin;
+        }
 
+        public override string ToString()
+        {
+            return $@"Hue: {Hue}
+Saturation: {Saturation}
+Brightness: {Brightness}
+Kelvin: {Kelvin}";
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+                return false;
+            else
+            {
+                Color color = (Color)obj;
+                return this.Hue == color.Hue &&
+                       this.Saturation == color.Saturation &&
+                       this.Brightness == color.Brightness && 
+                       this.Kelvin == color.Kelvin;
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Hue, Saturation, Brightness, Kelvin);
         }
     }
 }

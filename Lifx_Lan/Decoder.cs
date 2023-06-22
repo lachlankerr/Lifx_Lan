@@ -139,22 +139,22 @@ namespace Lifx_Lan
 
         public static void PrintFields(byte[] data)
         {
-            Console.WriteLine("Size:\t\t" + GetSize(data));
-            Console.WriteLine("Protocol:\t" + GetProtocol(data));
-            Console.WriteLine("Addressable:\t" + GetAddressable(data));
-            Console.WriteLine("Tagged:\t\t" + GetTagged(data));
-            Console.WriteLine("Origin:\t\t" + GetOrigin(data));
-            Console.WriteLine("Source:\t\t" + GetSource(data));
-            Console.WriteLine("Target:\t\t" + BitConverter.ToString(GetTarget(data)));
-            Console.WriteLine("Reserved2:\t" + BitConverter.ToString(GetReserved2(data)));
-            Console.WriteLine("Res_Required:\t" + GetRes_Required(data));
-            Console.WriteLine("Ack_Required:\t" + GetAck_Required(data));
-            Console.WriteLine("Reserved3:\t" + BitConverter.ToString(GetReserved3(data)));
-            Console.WriteLine("Sequence:\t" + GetSequence(data));
-            Console.WriteLine("Reserved4:\t" + BitConverter.ToString(GetReserved4(data)));
-            Console.WriteLine("Pkt_Type:\t" + GetPkt_Type(data) + " (" + (ushort)GetPkt_Type(data) + ")");
-            Console.WriteLine("Reserved5:\t" + BitConverter.ToString(GetReserved5(data)));
-            Console.WriteLine("Payload:\t" + BitConverter.ToString(GetPayload(data)));
+            Console.WriteLine(@$"Size:          {GetSize(data)}");
+            Console.WriteLine(@$"Protocol:      {GetProtocol(data)}");
+            Console.WriteLine(@$"Addressable:   {GetAddressable(data)}");
+            Console.WriteLine(@$"Tagged:        {GetTagged(data)}");
+            Console.WriteLine(@$"Origin:        {GetOrigin(data)}");
+            Console.WriteLine(@$"Source:        {GetSource(data)}");
+            Console.WriteLine(@$"Target:        {BitConverter.ToString(GetTarget(data))}");
+            Console.WriteLine(@$"Reserved2:     {BitConverter.ToString(GetReserved2(data))}");
+            Console.WriteLine(@$"Res_Required:  {GetRes_Required(data)}");
+            Console.WriteLine(@$"Ack_Required:  {GetAck_Required(data)}");
+            Console.WriteLine(@$"Reserved3:     {BitConverter.ToString(GetReserved3(data))}");
+            Console.WriteLine(@$"Sequence:      {GetSequence(data)}");
+            Console.WriteLine(@$"Reserved4:     {BitConverter.ToString(GetReserved4(data))}");
+            Console.WriteLine(@$"Pkt_Type:      {GetPkt_Type(data)} ({(ushort)GetPkt_Type(data)})");
+            Console.WriteLine(@$"Reserved5:     {BitConverter.ToString(GetReserved5(data))}");
+            Console.WriteLine(@$"Payload:       {BitConverter.ToString(GetPayload(data))}");
         }
 
         public static LifxPacket ToLifxPacket(byte[] data)

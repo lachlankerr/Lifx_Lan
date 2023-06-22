@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -118,6 +119,11 @@ namespace Lifx_Lan
                        this.Origin.Xor(frameHeader.Origin).OfType<bool>().All(e => !e) &&
                        this.Source == frameHeader.Source;
             }
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Size, Protocol, Addressable, Tagged, Origin, Source);
         }
     }
 }

@@ -14,7 +14,14 @@ namespace Lifx_Lan
 
         public int Port { get; } = Lan.DEFAULT_PORT;
 
-        public Product Product { get; }
+        public Product? Product { get; set; } = null;
+
+        public Device(byte[] serial_number, string ip, int port)
+        {
+            Serial_Number = serial_number;
+            IP = ip;
+            Port = port;
+        }
 
         public Device(byte[] serial_number, string ip, int port, int vendor_id, int product_id, int firmware_major, int firmware_minor) 
         {
@@ -27,11 +34,32 @@ namespace Lifx_Lan
 
         public override string ToString()
         {
-            return $@"Serial_Number: {BitConverter.ToString(Serial_Number)}
+            string output = $@"Serial_Number: {BitConverter.ToString(Serial_Number)}
 IP: {IP}
-Port: {Port}
+Port: {Port}"; output += Product != null ? $@"
 
-{Product}";
+{Product}" : "";
+            return output;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+                return false;
+            else
+            {
+                Device device = (Device)obj;
+                return this.Serial_Number.SequenceEqual(device.Serial_Number) &&
+                       this.IP.Equals(device.IP) &&
+                       this.Port == device.Port &&
+                       ((this.Product == null && device.Product == null) ||
+                       (this.Product != null && device.Product != null && this.Product.Equals(device.Product)));
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Serial_Number, IP, Port, Product);
         }
     }
 }

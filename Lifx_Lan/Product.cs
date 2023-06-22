@@ -86,5 +86,27 @@ Firmware: ({Firmware_Major}, {Firmware_Minor})
 Features: [{Features}
 ]";
         }
+
+        public override bool Equals(object? obj)
+        {
+            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+                return false;
+            else
+            {
+                Product product = (Product)obj;
+                return this.Vendor_ID == product.Vendor_ID &&
+                       this.Vendor_Name == product.Vendor_Name &&
+                       this.Product_ID == product.Product_ID &&
+                       this.Product_Name == product.Product_Name &&
+                       this.Firmware_Major == product.Firmware_Major && 
+                       this.Firmware_Minor == product.Firmware_Minor &&
+                       this.Features.Equals(product.Features);
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Vendor_ID, Vendor_Name, Product_ID, Product_Name, Firmware_Major, Firmware_Minor, Features);
+        }
     }
 }

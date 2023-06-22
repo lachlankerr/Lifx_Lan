@@ -109,32 +109,38 @@ namespace Lifx_Lan
         /// <param name="numDevices">The total number of devices we are looking for, set to zero if it is an unknown number</param>
         public void StartDiscovery(int timeoutPerRun = ONE_SECOND, int numRuns = 3, int numDevices = 0)
         {
-            //construct discovery packet
-            LifxPacket discoveryPacket = new LifxPacket(Pkt_Type.GetService, true);
+            List<Device> devices = new List<Device>();
+            IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+
+            LifxPacket discoveryPacket = new LifxPacket(Pkt_Type.GetService, true);//construct discovery packet
             for (int r = 0; r < numRuns; r++)
             {
                 SendPacket(discoveryPacket, new IPEndPoint(GetBroadcastAddress(GetLocalIP(), GetSubnetMask(GetLocalIP())), DEFAULT_PORT), printMessages: true);
 
+                byte[] receivedBytes = udpClient.Receive(ref RemoteIpEndPoint);
+
+                // Uses the IPEndPoint object to determine which of these two hosts responded.
 
 
-                //byte[] receivedBytes = udpClient.Receive(ref RemoteIpEndPoint);
-                //udpClient.ReceiveAsync
-                //System.Threading.Thread.Sleep(500);
+                if (Decoder.IsValid(receivedBytes))
+                {
+                    LifxPacket receivedPacket = Decoder.ToLifxPacket(receivedBytes);
 
-                //SendPacket(discoveryPacket, "192.168.10.255", printMessages: true);
+                    if (receivedPacket.protocolHeader.Pkt_Type == Pkt_Type.StateService) 
+                    {
+                        StateService stateService = new StateService(receivedPacket.payload.Data);
+                        Console.WriteLine(stateService.Service);
+                        Console.WriteLine(stateService.Port);
+                    }
 
-
-
-                ReceivePacket(printMessages: true);
-                ReceivePacket(printMessages: true);
-                ReceivePacket(printMessages: true);
-                ReceivePacket(printMessages: true);
-                ReceivePacket(printMessages: true);
-                ReceivePacket(printMessages: true);
-                ReceivePacket(printMessages: true);
-                ReceivePacket(printMessages: true);
-                ReceivePacket(printMessages: true);
-                ReceivePacket(printMessages: true);
+                    Console.WriteLine();
+                    Console.WriteLine("Received:");
+                    Console.WriteLine(BitConverter.ToString(receivedBytes));
+                    Console.WriteLine();
+                    Decoder.PrintFields(receivedBytes);
+                    Console.WriteLine();
+                    Console.WriteLine("This message was sent from " + RemoteIpEndPoint.Address.ToString() + " on their port number " + RemoteIpEndPoint.Port.ToString());
+                }
             }
         }
 
@@ -181,45 +187,37 @@ namespace Lifx_Lan
         /// </summary>
         /// <param name="port">The port number we are waiting for a response on</param>
         /// <returns></returns>
-        public LifxPacket? ReceivePacket(int port = DEFAULT_PORT, bool printMessages = false)
+        public LifxPacket ReceivePacket(bool printMessages = false)
         {
-            LifxPacket? receivedPacket = null;
-            try
+            LifxPacket receivedPacket;
+            Console.WriteLine("\nWaiting for response...");
+            IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+
+            byte[] receivedBytes = udpClient.Receive(ref RemoteIpEndPoint);
+
+            // Uses the IPEndPoint object to determine which of these two hosts responded.
+
+
+            if (Decoder.IsValid(receivedBytes))
             {
-                Console.WriteLine("\nWaiting for response...");
-                IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                receivedPacket = Decoder.ToLifxPacket(receivedBytes);
 
-                byte[] receivedBytes = udpClient.Receive(ref RemoteIpEndPoint);
-
-                // Uses the IPEndPoint object to determine which of these two hosts responded.
-
-
-                if (Decoder.IsValid(receivedBytes))
+                if (printMessages)
                 {
-                    receivedPacket = Decoder.ToLifxPacket(receivedBytes);
-
-                    if (printMessages)
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine("Received:");
-                        Console.WriteLine(BitConverter.ToString(receivedBytes));
-                        Console.WriteLine();
-                        Decoder.PrintFields(receivedBytes);
-                        Console.WriteLine();
-                        Console.WriteLine("This message was sent from " + RemoteIpEndPoint.Address.ToString() + " on their port number " + RemoteIpEndPoint.Port.ToString());
-                    }
+                    Console.WriteLine();
+                    Console.WriteLine("Received:");
+                    Console.WriteLine(BitConverter.ToString(receivedBytes));
+                    Console.WriteLine();
+                    Decoder.PrintFields(receivedBytes);
+                    Console.WriteLine();
+                    Console.WriteLine("This message was sent from " + RemoteIpEndPoint.Address.ToString() + " on their port number " + RemoteIpEndPoint.Port.ToString());
                 }
-                else
-                {
-                    // wait for proper packet to arrive?
-                }
-                return receivedPacket;
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine(ex.ToString());
-                return null;
+                throw new Exception("Received non-lifx packet: " + BitConverter.ToString(receivedBytes) + " from " + RemoteIpEndPoint.Address.ToString() + " on their port number " + RemoteIpEndPoint.Port.ToString());
             }
+            return receivedPacket;
         }
     }
 }

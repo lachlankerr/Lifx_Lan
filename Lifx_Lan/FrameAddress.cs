@@ -38,7 +38,7 @@ namespace Lifx_Lan
         /// When you send a Get message it is best to set ack_required=0 and res_required=0, because these messages trigger an implicit State response. 
         /// Note that when you ask for a response with a Set message that changes the visual state of the device, you will get the old values in the State message sent back.
         /// </summary>
-        public bool Res_required { get; } = false;
+        public bool Res_Required { get; } = false;
 
         /// <summary>
         /// Acknowledgement message required.
@@ -48,7 +48,7 @@ namespace Lifx_Lan
         /// It is recommended you set ack_required=1 and res_required=0 when you change the device with a Set message. 
         /// When you send a Get message it is best to set ack_required=0 and res_required=0, because these messages trigger an implicit State response.
         /// </summary>
-        public bool Ack_required { get; } = true;
+        public bool Ack_Required { get; } = true;
 
         /// <summary>
         /// Any fields named reserved should be set to all 0s.
@@ -69,16 +69,16 @@ namespace Lifx_Lan
 
         public FrameAddress(bool res_required = false, bool ack_required = false, byte sequence = 1)
         {
-            Res_required = res_required;
-            Ack_required = ack_required;
+            Res_Required = res_required;
+            Ack_Required = ack_required;
             Sequence = sequence;
         }
 
         public FrameAddress(byte[] target, bool res_required = false, bool ack_required = false, byte sequence = 1) 
         {
             Target = target;
-            Res_required = res_required;
-            Ack_required = ack_required;
+            Res_Required = res_required;
+            Ack_Required = ack_required;
             Sequence = sequence;
         }
 
@@ -86,8 +86,8 @@ namespace Lifx_Lan
         {
             Target = target;
             Reserved2 = reserved2;
-            Res_required = res_required;
-            Ack_required = ack_required;
+            Res_Required = res_required;
+            Ack_Required = ack_required;
             Reserved3 = new BitArray(reserved3);
             Reserved3.Length = 6; //necessary for equals() method to work
             Sequence = sequence;
@@ -100,8 +100,8 @@ namespace Lifx_Lan
 
             BitArray reservedBits = new BitArray(reservedByte);
 
-            reservedBits.Set(0, Res_required);
-            reservedBits.Set(1, Ack_required);
+            reservedBits.Set(0, Res_Required);
+            reservedBits.Set(1, Ack_Required);
             reservedBits.Set(2, Reserved3[5]);
             reservedBits.Set(3, Reserved3[4]);
             reservedBits.Set(4, Reserved3[3]);
@@ -129,11 +129,16 @@ namespace Lifx_Lan
                 FrameAddress frameAddress = (FrameAddress)obj;
                 return this.Target.SequenceEqual(frameAddress.Target) &&
                        this.Reserved2.SequenceEqual(frameAddress.Reserved2) &&
-                       this.Res_required == frameAddress.Res_required &&
-                       this.Ack_required == frameAddress.Ack_required &&
+                       this.Res_Required == frameAddress.Res_Required &&
+                       this.Ack_Required == frameAddress.Ack_Required &&
                        this.Reserved3.Xor(frameAddress.Reserved3).OfType<bool>().All(e => !e) &&
                        this.Sequence == frameAddress.Sequence;
             }
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Target, Reserved2, Res_Required, Ack_Required, Reserved3, Sequence);
         }
     }
 }
