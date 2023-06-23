@@ -15,7 +15,7 @@ namespace Lifx_Lan
         public StateService(byte[] bytes)
         {
             if (bytes.Length != 5)
-                throw new ArgumentException("Wrong number of bytes for this payload type");
+                throw new ArgumentException("Wrong number of bytes for this payload type, expected 5");
 
             Service = (Services)bytes[0];
             Port = BitConverter.ToUInt32(bytes, 1);
