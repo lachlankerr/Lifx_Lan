@@ -7,14 +7,36 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Lifx_Lan
 {
+    /// <summary>
+    /// This packet tell us the version of the firmware on the device. 
+    /// This information can be used with our Product Registry to determine what capabilities are supported by the device.
+    /// 
+    /// This packet is the reply to the GetVersion (32) message.
+    /// </summary>
     internal class StateVersion
     {
+        /// <summary>
+        /// For LIFX products this value is 1. 
+        /// There may be devices in the future with a different vendor value.
+        /// </summary>
         public UInt32 Vendor { get; } = 0;
 
+        /// <summary>
+        /// The product id of the device. 
+        /// The available products can be found in our Product Registry.
+        /// </summary>
         public UInt32 Product { get; } = 0;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public byte[] Reserved6 { get; } = new byte[4];
 
+        /// <summary>
+        /// Creates an instance of the <see cref="StateVersion"/> class so we can see the values received from the packet
+        /// </summary>
+        /// <param name="bytes">The payload data from the received <see cref="StateVersion"/> packet</param>
+        /// <exception cref="ArgumentException"></exception>
         public StateVersion(byte[] bytes)
         {
             if (bytes.Length != 12)

@@ -6,12 +6,29 @@ using System.Threading.Tasks;
 
 namespace Lifx_Lan
 {
+    /// <summary>
+    /// This packet is used to tell you what services are available and the port each service is on.
+    /// 
+    /// This packet is the reply to the GetService (2) message
+    /// </summary>
     internal class StateService
     {
+        /// <summary>
+        /// Using Services Enum
+        /// </summary>
         public Services Service { get; } = 0;
 
+        /// <summary>
+        /// The port of the service.
+        /// This value is usually 56700 but you should not assume this is always the case.
+        /// </summary>
         public UInt32 Port { get; } = 0;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="StateService"/> class so we can see the values received from the packet
+        /// </summary>
+        /// <param name="bytes">The payload data from the received <see cref="StateService"/> packet</param>
+        /// <exception cref="ArgumentException"></exception>
         public StateService(byte[] bytes)
         {
             if (bytes.Length != 5)
