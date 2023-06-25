@@ -14,9 +14,14 @@ namespace Lifx_Lan
     internal class Lan
     {
         public const int DEFAULT_PORT = 56700;
-        public const int ONE_SECOND = 1000; 
+        public const int ONE_SECOND = 1000;
 
-        UdpClient udpClient;
+        public byte Sequence = 1;
+
+        UdpClient UdpClient;
+
+        bool ReceivePackets = false;
+        List<NetworkInfo> receivedPackets = new List<NetworkInfo>();
 
         static void Main(string[] args)
         {
@@ -32,8 +37,35 @@ namespace Lifx_Lan
             //lan.SendPacket(testPacket, new IPEndPoint(IPAddress.Parse("192.168.10.25"), DEFAULT_PORT), printMessages: true);
             //lan.ReceivePacket(printMessages: true);
 
-            lan.Discovery(ONE_SECOND * 1, 5, 5, true);
+            List<NetworkInfo> networkInfos = lan.Discovery(ONE_SECOND * 1, 5, 5, true);
+            lan.GetProductInfo(networkInfos);
             //Console.WriteLine(new Product(1, 30, 3, 90));
+        }
+
+        public async void StartReceivingPackets()
+        {
+            ReceivePackets = true;
+            //IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            while (ReceivePackets)
+            {
+                UdpClient.Client.ReceiveTimeout = ONE_SECOND;
+                UdpReceiveResult receivedResult;
+                try
+                {
+                    receivedResult = await UdpClient.ReceiveAsync();
+                    LifxPacket receivedPacket = Decoder.ToLifxPacket(receivedResult.Buffer);
+                }
+                catch (SocketException ex)
+                {
+                    if (ex.SocketErrorCode != SocketError.TimedOut)
+                        throw;
+                }
+            }
+        }
+
+        public void StopReceivingPackets()
+        {
+            ReceivePackets = false;
         }
 
         /// <summary>
@@ -42,10 +74,10 @@ namespace Lifx_Lan
         /// <param name="timeout">in milliseconds</param>
         public Lan(int timeout)
         {
-            udpClient = new UdpClient(DEFAULT_PORT);
-            udpClient.EnableBroadcast = true;
-            udpClient.Client.SendTimeout = timeout;
-            udpClient.Client.ReceiveTimeout = timeout;
+            UdpClient = new UdpClient(DEFAULT_PORT);
+            UdpClient.EnableBroadcast = true;
+            UdpClient.Client.SendTimeout = timeout;
+            UdpClient.Client.ReceiveTimeout = timeout;
             //udpClient.Client.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.Broadcast, true);
         }
 
@@ -127,11 +159,11 @@ namespace Lifx_Lan
 
                 while (networkInfos.Count < numDevices && stopwatch.ElapsedMilliseconds < timeoutPerRun)
                 {
-                    udpClient.Client.ReceiveTimeout = Math.Abs(timeoutPerRun - (int)stopwatch.ElapsedMilliseconds);
+                    UdpClient.Client.ReceiveTimeout = Math.Abs(timeoutPerRun - (int)stopwatch.ElapsedMilliseconds);
                     byte[] receivedBytes = new byte[0];
                     try
                     {
-                        receivedBytes = udpClient.Receive(ref RemoteIpEndPoint);
+                        receivedBytes = UdpClient.Receive(ref RemoteIpEndPoint);
                     }
                     catch (SocketException ex) 
                     {
@@ -161,7 +193,7 @@ namespace Lifx_Lan
                             //Console.WriteLine(stateService.Service);
                             //Console.WriteLine(stateService.Port);
 
-                            NetworkInfo newNetworkInfo = new NetworkInfo(receivedPacket.frameAddress.Target.Take(6).ToArray(), RemoteIpEndPoint.Address, RemoteIpEndPoint.Port);
+                            NetworkInfo newNetworkInfo = new NetworkInfo(receivedPacket.frameAddress.Target.Take(6).ToArray(), RemoteIpEndPoint.Address, (int)stateService.Port, receivedPacket);
 
                             if (!networkInfos.Contains(newNetworkInfo))
                                 networkInfos.Add(newNetworkInfo);
@@ -187,6 +219,16 @@ namespace Lifx_Lan
             return networkInfos;
         }
 
+        public void GetProductInfo(List<NetworkInfo> networkInfos)
+        {
+            foreach (NetworkInfo networkInfo in networkInfos)
+            {
+                LifxPacket getVersionPacket = new LifxPacket(networkInfo.Serial_Number, Pkt_Type.GetVersion);
+                SendPacket(getVersionPacket, new IPEndPoint(networkInfo.Address, networkInfo.Port));
+                ReceivePacket();
+            }
+        }
+
         /// <summary>
         /// Sends the specified <see cref="LifxPacket"/> to the specified ip on the specified port.
         /// </summary>
@@ -197,12 +239,13 @@ namespace Lifx_Lan
         /// <returns>The number of bytes sent</returns>
         public int SendPacket(LifxPacket packet, IPEndPoint addr, bool printMessages = false)
         {
+            unchecked { packet.frameAddress.Sequence = Sequence++; }
             if (Decoder.IsValid(packet.ToBytes())) //no point sending useless data that might damage our devices
             {
                 try
                 {
                     //udpClient.Connect(ip, port); //this was the culprit, was only looking for responses from our broadcast address, which is wrong since any responses would have the ip of the device not broadcast
-                    int bytesSent = udpClient.Send(packet.ToBytes(), packet.ToBytes().Length, addr);
+                    int bytesSent = UdpClient.Send(packet.ToBytes(), packet.ToBytes().Length, addr);
                     //udpClient.Send(packet.ToBytes(), packet.ToBytes().Length, addr);
 
 
@@ -236,7 +279,7 @@ namespace Lifx_Lan
             Console.WriteLine("\nWaiting for response...");
             IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
 
-            byte[] receivedBytes = udpClient.Receive(ref RemoteIpEndPoint);
+            byte[] receivedBytes = UdpClient.Receive(ref RemoteIpEndPoint);
 
             // Uses the IPEndPoint object to determine which of these two hosts responded.
 

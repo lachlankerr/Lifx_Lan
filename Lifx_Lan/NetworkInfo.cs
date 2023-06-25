@@ -15,13 +15,16 @@ namespace Lifx_Lan
 
         public int Port { get; } = Lan.DEFAULT_PORT;
 
-        public NetworkInfo(byte[] serial_number, IPAddress address, int port)
+        public LifxPacket Packet { get; } 
+
+        public NetworkInfo(byte[] serial_number, IPAddress address, int port, LifxPacket packet)
         {
             if (serial_number.Length != 6)
                 throw new ArgumentException($"Serial number must be of length 6, given: {BitConverter.ToString(Serial_Number)}");
             Serial_Number = serial_number;
             Address = address;
             Port = port;
+            Packet = packet;
         }
 
         public override string ToString()

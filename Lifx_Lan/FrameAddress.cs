@@ -65,7 +65,7 @@ namespace Lifx_Lan
         /// 
         /// You can associate replies to their corresponding requests by matching the (source, sequence, target) values from the request and response packets.
         /// </summary>
-        public byte Sequence { get; } = 1;
+        public byte Sequence { get; set; } = 1;
 
         public FrameAddress(bool res_required = false, bool ack_required = false, byte sequence = 1)
         {
