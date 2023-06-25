@@ -9,7 +9,7 @@ namespace Lifx_Lan
 {
     internal class NetworkInfo
     {
-        public byte[] Serial_Number { get; } = new byte[6];
+        public byte[] Serial_Number { get; } = new byte[8];
 
         public IPAddress Address { get; }
 
@@ -19,8 +19,8 @@ namespace Lifx_Lan
 
         public NetworkInfo(byte[] serial_number, IPAddress address, int port, LifxPacket packet)
         {
-            if (serial_number.Length != 6)
-                throw new ArgumentException($"Serial number must be of length 6, given: {BitConverter.ToString(Serial_Number)}");
+            if (serial_number.Length != 8)
+                throw new ArgumentException($"Serial number must be of length 8, given: {BitConverter.ToString(Serial_Number)}");
             Serial_Number = serial_number;
             Address = address;
             Port = port;
