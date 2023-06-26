@@ -16,13 +16,18 @@ namespace Lifx_Lan
     {
         public const int DEFAULT_PORT = 56700;
         public const int ONE_SECOND = 1000;
+        public const int ADDR_SPACE = 15;
+        public const int PORT_SPACE = 5;
+        public const int PKT_SPACE = 13; //26 max
 
         public byte Sequence = 1;
 
         UdpClient UdpClient;
 
         List<NetworkInfo> ReceivedPackets = new List<NetworkInfo>();
+
         CancellationTokenSource ReceivingPacketsCancellation = new CancellationTokenSource();
+        CancellationTokenSource SendingDiscoveryPacketsCancellation = new CancellationTokenSource();
 
         static async Task Main(string[] args)
         {
@@ -33,7 +38,7 @@ namespace Lifx_Lan
 
             //Decoder.PrintFields(new byte[] { 0x24, 0x00, 0x00, 0x34, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00 });
 
-            Lan lan = new Lan(ONE_SECOND * 10);
+            Lan lan = new Lan();
 
             //lan.SendPacket(testPacket, new IPEndPoint(IPAddress.Parse("192.168.10.25"), DEFAULT_PORT), printMessages: true);
             //lan.ReceivePacket(printMessages: true);
@@ -41,13 +46,39 @@ namespace Lifx_Lan
             //List<NetworkInfo> networkInfos = lan.Discovery(ONE_SECOND * 1, 5, 5, true);
             //lan.GetProductInfo(networkInfos);
             //Console.WriteLine(new Product(1, 30, 3, 90));
-            lan.StartReceivingPackets();
-            await Task.Delay(ONE_SECOND * 60);
+            lan.StartReceivingPacketsAsync();
+            lan.StartSendingDiscoveryPacketsAsync();
+
+            Console.WriteLine("Press enter to stop sending discovery packets");
+            Console.ReadLine();
+
+            lan.StopSendingDiscoveryPackets();
+
+            Console.WriteLine("Still receiving packets, press enter to exit");
+            Console.ReadLine(); 
+
             lan.StopReceivingPackets();
             await Task.Delay(ONE_SECOND);
         }
 
-        public async void StartReceivingPackets(bool ignoreGetService = false)
+        public Lan()
+        {
+            try
+            {
+                UdpClient = new UdpClient(DEFAULT_PORT);
+                UdpClient.EnableBroadcast = true;
+            }
+            catch (SocketException e)
+            {
+                if (e.SocketErrorCode == SocketError.AddressAlreadyInUse)
+                {
+                    Console.WriteLine($"Port {DEFAULT_PORT} already in use by a different program, close it and try again.\n");
+                }
+                throw;
+            }
+        }
+
+        public async void StartReceivingPacketsAsync(bool ignoreGetService = false)
         {
             CancellationToken token = ReceivingPacketsCancellation.Token;
             Debug.WriteLine("Waiting for packets...");
@@ -61,7 +92,7 @@ namespace Lifx_Lan
                     NetworkInfo networkInfo = new NetworkInfo(receivedPacket.frameAddress.Target, receivedResult.RemoteEndPoint.Address, receivedResult.RemoteEndPoint.Port, receivedPacket);
                     if (!(ignoreGetService && receivedPacket.protocolHeader.Pkt_Type == Pkt_Type.GetService))
                     {
-                        Debug.WriteLine($"Received from {receivedResult.RemoteEndPoint.Address}:{receivedResult.RemoteEndPoint.Port} {BitConverter.ToString(receivedResult.Buffer)}");
+                        Debug.WriteLine($"Received {receivedResult.RemoteEndPoint.Address,-ADDR_SPACE}:{receivedResult.RemoteEndPoint.Port,-PORT_SPACE} {receivedPacket.protocolHeader.Pkt_Type,-PKT_SPACE} {BitConverter.ToString(receivedResult.Buffer)}");
                         ReceivedPackets.Add(networkInfo);
                     }
                 }
@@ -82,10 +113,30 @@ namespace Lifx_Lan
             ReceivingPacketsCancellation.Cancel();
         }
 
-        public async NetworkInfo SendThenAwaitResponseAsync()
+        public async void StartSendingDiscoveryPacketsAsync(int delay = ONE_SECOND * 5)
         {
+            CancellationToken token = SendingDiscoveryPacketsCancellation.Token;
+            IPEndPoint broadcastIpEndPoint = new IPEndPoint(GetBroadcastAddress(GetLocalIP(), GetSubnetMask(GetLocalIP())), DEFAULT_PORT);
+            LifxPacket discoveryPacket = new LifxPacket(Pkt_Type.GetService, true);
 
+            Debug.WriteLine("Starting to send discovery packets...");
+            while (!token.IsCancellationRequested)
+            {
+                await SendPacketAsync(discoveryPacket, broadcastIpEndPoint, token);
+                await Task.Delay(delay);
+            }
         }
+
+        public void StopSendingDiscoveryPackets()
+        {
+            Debug.WriteLine("Stop sending discovery packets");
+            SendingDiscoveryPacketsCancellation.Cancel();
+        }
+
+        //public async NetworkInfo SendThenAwaitResponseAsync()
+        //{
+        //    return new NetworkInfo();
+        //}
 
         public List<NetworkInfo> MatchDiscoveryReplyToRequest(UInt32 source, byte sequence)
         {
@@ -120,19 +171,6 @@ namespace Lifx_Lan
                 }
             }
             return matchingReplies;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="timeout">in milliseconds</param>
-        public Lan(int timeout)
-        {
-            UdpClient = new UdpClient(DEFAULT_PORT);
-            UdpClient.EnableBroadcast = true;
-            UdpClient.Client.SendTimeout = timeout;
-            //UdpClient.Client.ReceiveTimeout = timeout;
-            //udpClient.Client.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.Broadcast, true);
         }
 
         /// <summary>
@@ -208,7 +246,7 @@ namespace Lifx_Lan
             for (int r = 0; r < maxRuns; r++)
             {
                 stopwatch.Restart();
-                SendPacket(discoveryPacket, new IPEndPoint(GetBroadcastAddress(GetLocalIP(), GetSubnetMask(GetLocalIP())), DEFAULT_PORT), printMessages: false);
+                SendPacket(discoveryPacket, new IPEndPoint(GetBroadcastAddress(GetLocalIP(), GetSubnetMask(GetLocalIP())), DEFAULT_PORT));
                 stopwatch.Start();
 
                 while (networkInfos.Count < numDevices && stopwatch.ElapsedMilliseconds < timeoutPerRun)
@@ -297,7 +335,7 @@ namespace Lifx_Lan
                 try
                 {
                     int bytesSent = UdpClient.Send(packet.ToBytes(), packet.ToBytes().Length, addr);
-                    Debug.WriteLine($"Sent {addr.Address}:{addr.Port} {BitConverter.ToString(packet.ToBytes())}");
+                    Debug.WriteLine($"Sent     {addr.Address,-ADDR_SPACE}:{addr.Port,-PORT_SPACE} {packet.protocolHeader.Pkt_Type,-26} {BitConverter.ToString(packet.ToBytes())}");
                     //Decoder.PrintFields(packet.ToBytes());
 
                     return bytesSent;
@@ -306,6 +344,27 @@ namespace Lifx_Lan
                 {
                     Console.WriteLine(ex.ToString());
                     return 0;
+                }
+            }
+            return 0;
+        }
+
+        public async Task<int> SendPacketAsync(LifxPacket packet, IPEndPoint addr, CancellationToken cancellationToken)
+        {
+            unchecked { packet.frameAddress.Sequence = Sequence++; }
+            if (Decoder.IsValid(packet.ToBytes())) //no point sending useless data that might damage our devices
+            {
+                try
+                {
+                    int bytesSent = await UdpClient.SendAsync(packet.ToBytes(), addr, cancellationToken);
+                    Debug.WriteLine($"Sent     {addr.Address,-ADDR_SPACE}:{addr.Port,-PORT_SPACE} {packet.protocolHeader.Pkt_Type,-PKT_SPACE} {BitConverter.ToString(packet.ToBytes())}");
+                    //Decoder.PrintFields(packet.ToBytes());
+
+                    return bytesSent;
+                }
+                catch (OperationCanceledException)
+                {
+                    Debug.WriteLine($"Send cancelled {addr.Address,-ADDR_SPACE}:{addr.Port,-PORT_SPACE} {packet.protocolHeader.Pkt_Type,-PKT_SPACE} {BitConverter.ToString(packet.ToBytes())}");
                 }
             }
             return 0;
