@@ -77,6 +77,11 @@ namespace Lifx_Lan
             return FrameHeader.ToBytes().Concat(FrameAddress.ToBytes()).Concat(ProtocolHeader.ToBytes()).Concat(Payload.ToBytes()).ToArray();
         }
 
+        public override string ToString()
+        {
+            return BitConverter.ToString(ToBytes());
+        }
+
         public override bool Equals(object? obj)
         {
             if ((obj == null) || !this.GetType().Equals(obj.GetType())) 

@@ -26,8 +26,7 @@ namespace Lifx_Lan
         {
             return $@"IP: {Address}
 Port: {Port}
-Packet: 
-{Packet}";
+Packet: {Packet}";
         }
 
         public override bool Equals(object? obj)
@@ -39,7 +38,7 @@ Packet:
                 NetworkInfo networkInfo = (NetworkInfo)obj;
                 return this.Address.Equals(networkInfo.Address) &&
                        this.Port == networkInfo.Port &&
-                       this.Packet == networkInfo.Packet;
+                       this.Packet.Equals(networkInfo.Packet);
             }
         }
 

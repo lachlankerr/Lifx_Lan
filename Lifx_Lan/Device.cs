@@ -21,7 +21,8 @@ namespace Lifx_Lan
 
         public override string ToString()
         {
-            return $@"{NetworkInfo}
+            return $@"Serial: {BitConverter.ToString(NetworkInfo.Packet.FrameAddress.Target.Take(6).ToArray())}
+Address: {NetworkInfo.Address}:{NetworkInfo.Port}
 {Product}";
         }
 
@@ -31,15 +32,17 @@ namespace Lifx_Lan
                 return false;
             else
             {
-                Device device = (Device)obj;
-                return this.NetworkInfo.Equals(device.NetworkInfo) &&
+                Device device = (Device)obj; //don't use NetworkInfo.Equals() for Device.Equals(), just grab relevant data
+                return this.NetworkInfo.Packet.FrameAddress.Target.SequenceEqual(device.NetworkInfo.Packet.FrameAddress.Target) &&
+                       this.NetworkInfo.Address.Equals(device.NetworkInfo.Address) &&
+                       this.NetworkInfo.Port.Equals(device.NetworkInfo.Port) &&
                        this.Product.Equals(device.Product);
             }
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(NetworkInfo, Product);
+            return HashCode.Combine(NetworkInfo.Packet.FrameAddress.Target, NetworkInfo.Address, NetworkInfo.Port, Product);
         }
     }
 }

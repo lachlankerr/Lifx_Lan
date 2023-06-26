@@ -18,7 +18,7 @@ namespace Lifx_Lan
         public const int ONE_SECOND = 1000;
         public const int ADDR_SPACE = 15;
         public const int PORT_SPACE = 5;
-        public const int PKT_SPACE = 13; //26 max
+        public const int PKT_SPACE = 26; //26 max
 
         public byte Sequence = 1;
 
@@ -53,6 +53,19 @@ namespace Lifx_Lan
             Console.ReadLine();
 
             lan.StopSendingDiscoveryPackets();
+
+            List<string> devices = new List<string>();
+
+            foreach (NetworkInfo netinfo in lan.ReceivedPackets.ToList())
+            {
+                if (netinfo.Packet.ProtocolHeader.Pkt_Type == Pkt_Type.StateService && !devices.Contains(netinfo.Address.ToString()))
+                {
+                    Device device = await lan.CreateDeviceFromStateServiceAsync(netinfo);
+                    Console.WriteLine($"{device}\n");
+                    devices.Add(netinfo.Address.ToString());
+                    //break;
+                }
+            }
 
             Console.WriteLine("Still receiving packets, press enter to exit");
             Console.ReadLine(); 
@@ -89,7 +102,11 @@ namespace Lifx_Lan
                 {
                     receivedResult = await UdpClient.ReceiveAsync(token);
                     LifxPacket receivedPacket = Decoder.ToLifxPacket(receivedResult.Buffer);
-                    NetworkInfo networkInfo = new NetworkInfo(receivedResult.RemoteEndPoint.Address, receivedResult.RemoteEndPoint.Port, receivedPacket);
+                    NetworkInfo networkInfo;
+                    if (receivedPacket.ProtocolHeader.Pkt_Type == Pkt_Type.StateService) //not sure if this is actually needed, but better to be safe
+                        networkInfo = new NetworkInfo(receivedResult.RemoteEndPoint.Address, (int)new StateService(receivedPacket.Payload.ToBytes()).Port, receivedPacket);
+                    else
+                        networkInfo = new NetworkInfo(receivedResult.RemoteEndPoint.Address, receivedResult.RemoteEndPoint.Port, receivedPacket);
                     if (!(ignoreGetService && receivedPacket.ProtocolHeader.Pkt_Type == Pkt_Type.GetService))
                     {
                         Debug.WriteLine($"Received {receivedResult.RemoteEndPoint.Address,-ADDR_SPACE}:{receivedResult.RemoteEndPoint.Port,-PORT_SPACE} {receivedPacket.ProtocolHeader.Pkt_Type,-PKT_SPACE} {BitConverter.ToString(receivedResult.Buffer)}");
@@ -113,7 +130,7 @@ namespace Lifx_Lan
             ReceivingPacketsCancellation.Cancel();
         }
 
-        public async void StartSendingDiscoveryPacketsAsync(int delay = ONE_SECOND * 5)
+        public async void StartSendingDiscoveryPacketsAsync(int delay = ONE_SECOND * 1)
         {
             CancellationToken token = SendingDiscoveryPacketsCancellation.Token;
             IPEndPoint broadcastIpEndPoint = new IPEndPoint(GetBroadcastAddress(GetLocalIP(), GetSubnetMask(GetLocalIP())), DEFAULT_PORT);
@@ -133,9 +150,33 @@ namespace Lifx_Lan
             SendingDiscoveryPacketsCancellation.Cancel();
         }
 
-        public void GetFoundDevices()
+        public async Task<Device> CreateDeviceFromStateServiceAsync(NetworkInfo networkInfo)
         {
+            if (networkInfo.Packet.ProtocolHeader.Pkt_Type != Pkt_Type.StateService)
+                throw new ArgumentException($"Specified packet was not a StateService, received: {networkInfo.Packet.ProtocolHeader.Pkt_Type}");
+            
+            LifxPacket getLabelPacket           = new LifxPacket(networkInfo.Packet.FrameAddress.Target, Pkt_Type.GetLabel);
+            LifxPacket getVersionPacket         = new LifxPacket(networkInfo.Packet.FrameAddress.Target, Pkt_Type.GetVersion);
+            LifxPacket getHostFirmwarePacket    = new LifxPacket(networkInfo.Packet.FrameAddress.Target, Pkt_Type.GetHostFirmware);
 
+            await SendPacketAsync(getLabelPacket, new IPEndPoint(networkInfo.Address, networkInfo.Port), default);
+            await SendPacketAsync(getVersionPacket, new IPEndPoint(networkInfo.Address, networkInfo.Port), default);
+            await SendPacketAsync(getHostFirmwarePacket, new IPEndPoint(networkInfo.Address, networkInfo.Port), default);
+
+            //todo add a proper delay
+            await Task.Delay(ONE_SECOND / 2);
+            
+            NetworkInfo getLabelResponse        = MatchReplyToRequest(getLabelPacket.FrameHeader.Source, getLabelPacket.FrameAddress.Sequence, getLabelPacket.FrameAddress.Target).First();
+            NetworkInfo getVersionResponse      = MatchReplyToRequest(getVersionPacket.FrameHeader.Source, getVersionPacket.FrameAddress.Sequence, getVersionPacket.FrameAddress.Target).First();
+            NetworkInfo getHostFirmwareResponse = MatchReplyToRequest(getHostFirmwarePacket.FrameHeader.Source, getHostFirmwarePacket.FrameAddress.Sequence, getHostFirmwarePacket.FrameAddress.Target).First();
+            
+            StateLabel stateLabel               = new StateLabel(getLabelResponse.Packet.Payload.ToBytes());
+            StateVersion stateVersion           = new StateVersion(getVersionResponse.Packet.Payload.ToBytes());
+            StateHostFirmware stateHostFirmware = new StateHostFirmware(getHostFirmwareResponse.Packet.Payload.ToBytes());
+
+            Product product = new Product(stateLabel.Label, (int)stateVersion.Vendor, (int)stateVersion.Product, stateHostFirmware.Version_Major, stateHostFirmware.Version_Minor);
+            Device device = new Device(networkInfo, product);
+            return device;
         }
 
         //public async NetworkInfo SendThenAwaitResponseAsync()
@@ -369,7 +410,7 @@ namespace Lifx_Lan
                 }
                 catch (OperationCanceledException)
                 {
-                    Debug.WriteLine($"Send cancelled {addr.Address,-ADDR_SPACE}:{addr.Port,-PORT_SPACE} {packet.ProtocolHeader.Pkt_Type,-PKT_SPACE} {BitConverter.ToString(packet.ToBytes())}");
+                    Debug.WriteLine($"Not sent {addr.Address,-ADDR_SPACE}:{addr.Port,-PORT_SPACE} {packet.ProtocolHeader.Pkt_Type,-PKT_SPACE} {BitConverter.ToString(packet.ToBytes())}");
                 }
             }
             return 0;

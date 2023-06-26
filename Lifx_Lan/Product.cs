@@ -13,6 +13,8 @@ namespace Lifx_Lan
     /// </summary>
     internal class Product
     {
+        public string Label { get; } = "";
+
         public int Vendor_ID { get; } = 0;
 
         public string Vendor_Name { get; set; } = "";
@@ -27,8 +29,9 @@ namespace Lifx_Lan
 
         public Features Features { get; set; } = new Features();
 
-        public Product(int vendor_id, int product_id, int firmware_major, int firmware_minor)
+        public Product(string label, int vendor_id, int product_id, int firmware_major, int firmware_minor)
         {
+            Label = label;                      //GetLabel
             Vendor_ID = vendor_id;              //GetVersion
             Product_ID = product_id;            //GetVersion
             Firmware_Major = firmware_major;    //GetHostFirmware
@@ -64,7 +67,7 @@ namespace Lifx_Lan
                                     (Firmware_Major == upgrade?["major"]?.GetValue<int>() && Firmware_Minor >= upgrade?["minor"]?.GetValue<int>()))
                                 {
                                     JsonNode? newFeatures = upgrade["features"];
-                                    Features = JsonSerializer.Deserialize<Features>(newFeatures) ?? new Features();
+                                    Features = JsonSerializer.Deserialize<Features>(newFeatures) ?? new Features(); //todo: fix how upgrades handle feature, it currently wipes exisiting values and sets them as default if they don't appear
                                 }
                             }
                         }
@@ -80,7 +83,8 @@ namespace Lifx_Lan
 
         public override string ToString()
         {
-            return $@"Vendor: {Vendor_Name} ({Vendor_ID})
+            return $@"Label: {Label}
+Vendor: {Vendor_Name} ({Vendor_ID})
 Name: {Product_Name} ({Product_ID})
 Firmware: ({Firmware_Major}, {Firmware_Minor})
 Features: [{Features}
@@ -94,7 +98,8 @@ Features: [{Features}
             else
             {
                 Product product = (Product)obj;
-                return this.Vendor_ID == product.Vendor_ID &&
+                return this.Label == product.Label &&
+                       this.Vendor_ID == product.Vendor_ID &&
                        this.Vendor_Name == product.Vendor_Name &&
                        this.Product_ID == product.Product_ID &&
                        this.Product_Name == product.Product_Name &&
@@ -106,7 +111,7 @@ Features: [{Features}
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Vendor_ID, Vendor_Name, Product_ID, Product_Name, Firmware_Major, Firmware_Minor, Features);
+            return HashCode.Combine(Label, Vendor_ID, Vendor_Name, Product_ID, Product_Name, Firmware_Major, Firmware_Minor, Features);
         }
     }
 }
