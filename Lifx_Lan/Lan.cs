@@ -89,10 +89,10 @@ namespace Lifx_Lan
                 {
                     receivedResult = await UdpClient.ReceiveAsync(token);
                     LifxPacket receivedPacket = Decoder.ToLifxPacket(receivedResult.Buffer);
-                    NetworkInfo networkInfo = new NetworkInfo(receivedPacket.frameAddress.Target, receivedResult.RemoteEndPoint.Address, receivedResult.RemoteEndPoint.Port, receivedPacket);
-                    if (!(ignoreGetService && receivedPacket.protocolHeader.Pkt_Type == Pkt_Type.GetService))
+                    NetworkInfo networkInfo = new NetworkInfo(receivedResult.RemoteEndPoint.Address, receivedResult.RemoteEndPoint.Port, receivedPacket);
+                    if (!(ignoreGetService && receivedPacket.ProtocolHeader.Pkt_Type == Pkt_Type.GetService))
                     {
-                        Debug.WriteLine($"Received {receivedResult.RemoteEndPoint.Address,-ADDR_SPACE}:{receivedResult.RemoteEndPoint.Port,-PORT_SPACE} {receivedPacket.protocolHeader.Pkt_Type,-PKT_SPACE} {BitConverter.ToString(receivedResult.Buffer)}");
+                        Debug.WriteLine($"Received {receivedResult.RemoteEndPoint.Address,-ADDR_SPACE}:{receivedResult.RemoteEndPoint.Port,-PORT_SPACE} {receivedPacket.ProtocolHeader.Pkt_Type,-PKT_SPACE} {BitConverter.ToString(receivedResult.Buffer)}");
                         ReceivedPackets.Add(networkInfo);
                     }
                 }
@@ -133,6 +133,11 @@ namespace Lifx_Lan
             SendingDiscoveryPacketsCancellation.Cancel();
         }
 
+        public void GetFoundDevices()
+        {
+
+        }
+
         //public async NetworkInfo SendThenAwaitResponseAsync()
         //{
         //    return new NetworkInfo();
@@ -144,9 +149,9 @@ namespace Lifx_Lan
 
             foreach (NetworkInfo response in ReceivedPackets)
             {
-                if (response.Packet.frameHeader.Source == source &&
-                    response.Packet.frameAddress.Sequence == sequence &&
-                    response.Packet.protocolHeader.Pkt_Type == Pkt_Type.StateService)
+                if (response.Packet.FrameHeader.Source == source &&
+                    response.Packet.FrameAddress.Sequence == sequence &&
+                    response.Packet.ProtocolHeader.Pkt_Type == Pkt_Type.StateService)
                 {
                     matchingReplies.Add(response);
                 }
@@ -163,9 +168,9 @@ namespace Lifx_Lan
 
             foreach (NetworkInfo response in ReceivedPackets)
             {
-                if (response.Packet.frameHeader.Source == source && 
-                    response.Packet.frameAddress.Sequence == sequence && 
-                    response.Serial_Number.SequenceEqual(target))
+                if (response.Packet.FrameHeader.Source == source && 
+                    response.Packet.FrameAddress.Sequence == sequence && 
+                    response.Packet.FrameAddress.Target.SequenceEqual(target))
                 {
                     matchingReplies.Add(response);
                 }
@@ -278,14 +283,14 @@ namespace Lifx_Lan
                     {
                         LifxPacket receivedPacket = Decoder.ToLifxPacket(receivedBytes);
 
-                        if (receivedPacket.protocolHeader.Pkt_Type == Pkt_Type.StateService)
+                        if (receivedPacket.ProtocolHeader.Pkt_Type == Pkt_Type.StateService)
                         {
                             //Decoder.PrintFields(receivedBytes);
-                            StateService stateService = new StateService(receivedPacket.payload.Data);
+                            StateService stateService = new StateService(receivedPacket.Payload.Data);
                             //Console.WriteLine(stateService.Service);
                             //Console.WriteLine(stateService.Port);
 
-                            NetworkInfo newNetworkInfo = new NetworkInfo(receivedPacket.frameAddress.Target, RemoteIpEndPoint.Address, (int)stateService.Port, receivedPacket);
+                            NetworkInfo newNetworkInfo = new NetworkInfo(RemoteIpEndPoint.Address, (int)stateService.Port, receivedPacket);
 
                             if (!networkInfos.Contains(newNetworkInfo))
                                 networkInfos.Add(newNetworkInfo);
@@ -315,7 +320,7 @@ namespace Lifx_Lan
         {
             foreach (NetworkInfo networkInfo in networkInfos)
             {
-                LifxPacket getVersionPacket = new LifxPacket(networkInfo.Serial_Number, Pkt_Type.GetVersion);
+                LifxPacket getVersionPacket = new LifxPacket(networkInfo.Packet.FrameAddress.Target, Pkt_Type.GetVersion);
                 SendPacket(getVersionPacket, new IPEndPoint(networkInfo.Address, networkInfo.Port));
                 //ReceivePacket();
             }
@@ -329,13 +334,13 @@ namespace Lifx_Lan
         /// <returns>The number of bytes sent</returns>
         public int SendPacket(LifxPacket packet, IPEndPoint addr)
         {
-            unchecked { packet.frameAddress.Sequence = Sequence++; }
+            unchecked { packet.FrameAddress.Sequence = Sequence++; }
             if (Decoder.IsValid(packet.ToBytes())) //no point sending useless data that might damage our devices
             {
                 try
                 {
                     int bytesSent = UdpClient.Send(packet.ToBytes(), packet.ToBytes().Length, addr);
-                    Debug.WriteLine($"Sent     {addr.Address,-ADDR_SPACE}:{addr.Port,-PORT_SPACE} {packet.protocolHeader.Pkt_Type,-26} {BitConverter.ToString(packet.ToBytes())}");
+                    Debug.WriteLine($"Sent     {addr.Address,-ADDR_SPACE}:{addr.Port,-PORT_SPACE} {packet.ProtocolHeader.Pkt_Type,-26} {BitConverter.ToString(packet.ToBytes())}");
                     //Decoder.PrintFields(packet.ToBytes());
 
                     return bytesSent;
@@ -351,20 +356,20 @@ namespace Lifx_Lan
 
         public async Task<int> SendPacketAsync(LifxPacket packet, IPEndPoint addr, CancellationToken cancellationToken)
         {
-            unchecked { packet.frameAddress.Sequence = Sequence++; }
+            unchecked { packet.FrameAddress.Sequence = Sequence++; }
             if (Decoder.IsValid(packet.ToBytes())) //no point sending useless data that might damage our devices
             {
                 try
                 {
                     int bytesSent = await UdpClient.SendAsync(packet.ToBytes(), addr, cancellationToken);
-                    Debug.WriteLine($"Sent     {addr.Address,-ADDR_SPACE}:{addr.Port,-PORT_SPACE} {packet.protocolHeader.Pkt_Type,-PKT_SPACE} {BitConverter.ToString(packet.ToBytes())}");
+                    Debug.WriteLine($"Sent     {addr.Address,-ADDR_SPACE}:{addr.Port,-PORT_SPACE} {packet.ProtocolHeader.Pkt_Type,-PKT_SPACE} {BitConverter.ToString(packet.ToBytes())}");
                     //Decoder.PrintFields(packet.ToBytes());
 
                     return bytesSent;
                 }
                 catch (OperationCanceledException)
                 {
-                    Debug.WriteLine($"Send cancelled {addr.Address,-ADDR_SPACE}:{addr.Port,-PORT_SPACE} {packet.protocolHeader.Pkt_Type,-PKT_SPACE} {BitConverter.ToString(packet.ToBytes())}");
+                    Debug.WriteLine($"Send cancelled {addr.Address,-ADDR_SPACE}:{addr.Port,-PORT_SPACE} {packet.ProtocolHeader.Pkt_Type,-PKT_SPACE} {BitConverter.ToString(packet.ToBytes())}");
                 }
             }
             return 0;

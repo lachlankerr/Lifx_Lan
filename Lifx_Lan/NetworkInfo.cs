@@ -9,19 +9,14 @@ namespace Lifx_Lan
 {
     internal class NetworkInfo
     {
-        public byte[] Serial_Number { get; } = new byte[8];
-
         public IPAddress Address { get; }
 
         public int Port { get; } = Lan.DEFAULT_PORT;
 
         public LifxPacket Packet { get; } 
 
-        public NetworkInfo(byte[] serial_number, IPAddress address, int port, LifxPacket packet)
+        public NetworkInfo(IPAddress address, int port, LifxPacket packet)
         {
-            if (serial_number.Length != 8)
-                throw new ArgumentException($"Serial number must be of length 8, given: {BitConverter.ToString(Serial_Number)}");
-            Serial_Number = serial_number;
             Address = address;
             Port = port;
             Packet = packet;
@@ -29,9 +24,10 @@ namespace Lifx_Lan
 
         public override string ToString()
         {
-            return $@"Serial_Number: {BitConverter.ToString(Serial_Number)}
-IP: {Address}
-Port: {Port}";
+            return $@"IP: {Address}
+Port: {Port}
+Packet: 
+{Packet}";
         }
 
         public override bool Equals(object? obj)
@@ -41,15 +37,15 @@ Port: {Port}";
             else
             {
                 NetworkInfo networkInfo = (NetworkInfo)obj;
-                return this.Serial_Number.SequenceEqual(networkInfo.Serial_Number) &&
-                       this.Address.Equals(networkInfo.Address) &&
-                       this.Port == networkInfo.Port;
+                return this.Address.Equals(networkInfo.Address) &&
+                       this.Port == networkInfo.Port &&
+                       this.Packet == networkInfo.Packet;
             }
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Serial_Number, Address, Port);
+            return HashCode.Combine(Address, Port, Packet);
         }
     }
 }
