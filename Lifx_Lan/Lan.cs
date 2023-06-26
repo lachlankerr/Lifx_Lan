@@ -77,6 +77,41 @@ namespace Lifx_Lan
             }
         }
 
+        public List<NetworkInfo> MatchDiscoveryReplyToRequest(UInt32 source, byte sequence)
+        {
+            List<NetworkInfo> matchingReplies = new List<NetworkInfo>(); //sometimes there are multiple replies
+
+            foreach (NetworkInfo response in receivedPackets)
+            {
+                if (response.Packet.frameHeader.Source == source &&
+                    response.Packet.frameAddress.Sequence == sequence &&
+                    response.Packet.protocolHeader.Pkt_Type == Pkt_Type.StateService)
+                {
+                    matchingReplies.Add(response);
+                }
+            }
+            return matchingReplies;
+        }
+
+        public List<NetworkInfo> MatchReplyToRequest(UInt32 source, byte sequence, byte[] target)
+        {
+            if (target.Length != 8)
+                throw new ArgumentException($"Serial number must be of length 8, given: {BitConverter.ToString(target)}");
+
+            List<NetworkInfo> matchingReplies = new List<NetworkInfo>(); //sometimes there are multiple replies
+
+            foreach (NetworkInfo response in receivedPackets)
+            {
+                if (response.Packet.frameHeader.Source == source && 
+                    response.Packet.frameAddress.Sequence == sequence && 
+                    response.Serial_Number.SequenceEqual(target))
+                {
+                    matchingReplies.Add(response);
+                }
+            }
+            return matchingReplies;
+        }
+
         public void StopReceivingPackets()
         {
             Debug.WriteLine("Stop receiving packets");
