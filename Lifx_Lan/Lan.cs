@@ -21,7 +21,7 @@ namespace Lifx_Lan
 
         UdpClient UdpClient;
 
-        List<NetworkInfo> receivedPackets = new List<NetworkInfo>();
+        List<NetworkInfo> ReceivedPackets = new List<NetworkInfo>();
         CancellationTokenSource ReceivingPacketsCancellation = new CancellationTokenSource();
 
         static async Task Main(string[] args)
@@ -62,7 +62,7 @@ namespace Lifx_Lan
                     if (!(ignoreGetService && receivedPacket.protocolHeader.Pkt_Type == Pkt_Type.GetService))
                     {
                         Debug.WriteLine($"Received from {receivedResult.RemoteEndPoint.Address}:{receivedResult.RemoteEndPoint.Port} {BitConverter.ToString(receivedResult.Buffer)}");
-                        receivedPackets.Add(networkInfo);
+                        ReceivedPackets.Add(networkInfo);
                     }
                 }
                 catch (OperationCanceledException)
@@ -76,12 +76,22 @@ namespace Lifx_Lan
                 }
             }
         }
+        public void StopReceivingPackets()
+        {
+            Debug.WriteLine("Stop receiving packets");
+            ReceivingPacketsCancellation.Cancel();
+        }
+
+        public async NetworkInfo SendThenAwaitResponseAsync()
+        {
+
+        }
 
         public List<NetworkInfo> MatchDiscoveryReplyToRequest(UInt32 source, byte sequence)
         {
             List<NetworkInfo> matchingReplies = new List<NetworkInfo>(); //sometimes there are multiple replies
 
-            foreach (NetworkInfo response in receivedPackets)
+            foreach (NetworkInfo response in ReceivedPackets)
             {
                 if (response.Packet.frameHeader.Source == source &&
                     response.Packet.frameAddress.Sequence == sequence &&
@@ -100,7 +110,7 @@ namespace Lifx_Lan
 
             List<NetworkInfo> matchingReplies = new List<NetworkInfo>(); //sometimes there are multiple replies
 
-            foreach (NetworkInfo response in receivedPackets)
+            foreach (NetworkInfo response in ReceivedPackets)
             {
                 if (response.Packet.frameHeader.Source == source && 
                     response.Packet.frameAddress.Sequence == sequence && 
@@ -110,12 +120,6 @@ namespace Lifx_Lan
                 }
             }
             return matchingReplies;
-        }
-
-        public void StopReceivingPackets()
-        {
-            Debug.WriteLine("Stop receiving packets");
-            ReceivingPacketsCancellation.Cancel();
         }
 
         /// <summary>
@@ -283,29 +287,18 @@ namespace Lifx_Lan
         /// Sends the specified <see cref="LifxPacket"/> to the specified ip on the specified port.
         /// </summary>
         /// <param name="packet">The <see cref="LifxPacket"/> to send to the device</param>
-        /// <param name="ip">The ip address to send our packet to</param>
-        /// <param name="port">The port number we are sending our packet on</param>
-        /// <param name="printMessages">Whether to print any text or not</param>
+        /// <param name="addr">The ip address and port to send our packet to</param>
         /// <returns>The number of bytes sent</returns>
-        public int SendPacket(LifxPacket packet, IPEndPoint addr, bool printMessages = false)
+        public int SendPacket(LifxPacket packet, IPEndPoint addr)
         {
             unchecked { packet.frameAddress.Sequence = Sequence++; }
             if (Decoder.IsValid(packet.ToBytes())) //no point sending useless data that might damage our devices
             {
                 try
                 {
-                    //udpClient.Connect(ip, port); //this was the culprit, was only looking for responses from our broadcast address, which is wrong since any responses would have the ip of the device not broadcast
                     int bytesSent = UdpClient.Send(packet.ToBytes(), packet.ToBytes().Length, addr);
-                    //udpClient.Send(packet.ToBytes(), packet.ToBytes().Length, addr);
-
-
-                    if (printMessages)
-                    {
-                        Console.WriteLine("Sent to " + addr.Address + " on port " + addr.Port + ":");
-                        Console.WriteLine(BitConverter.ToString(packet.ToBytes()));
-                        Console.WriteLine();
-                        Decoder.PrintFields(packet.ToBytes());
-                    }
+                    Debug.WriteLine($"Sent {addr.Address}:{addr.Port} {BitConverter.ToString(packet.ToBytes())}");
+                    //Decoder.PrintFields(packet.ToBytes());
 
                     return bytesSent;
                 }
