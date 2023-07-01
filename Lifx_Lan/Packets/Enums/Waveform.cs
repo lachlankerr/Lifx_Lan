@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lifx_Lan.Enums
+namespace Lifx_Lan.Packets.Enums
 {
     internal enum Waveform : byte
     {
