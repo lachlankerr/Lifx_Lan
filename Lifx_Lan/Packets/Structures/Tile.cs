@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Packets.Structures
 {
     /// <summary>
     /// This represents the information for a single device in a chain. 
@@ -15,17 +15,17 @@ namespace Lifx_Lan
         /// <summary>
         /// 
         /// </summary>
-        public Int16 Accel_Meas_X { get; }
+        public short Accel_Meas_X { get; }
 
         /// <summary>
         /// 
         /// </summary>
-        public Int16 Accel_Meas_Y { get; }
+        public short Accel_Meas_Y { get; }
 
         /// <summary>
         /// 
         /// </summary>
-        public Int16 Accel_Meas_Z { get; }
+        public short Accel_Meas_Z { get; }
 
         /// <summary>
         /// 
@@ -60,12 +60,12 @@ namespace Lifx_Lan
         /// <summary>
         /// The vendor id of the device (See StateVersion (33))
         /// </summary>
-        public UInt32 Device_Version_Vendor { get; }
+        public uint Device_Version_Vendor { get; }
 
         /// <summary>
         /// The product id of the device (See StateVersion (33))
         /// </summary>
-        public UInt32 Device_Version_Product { get; }
+        public uint Device_Version_Product { get; }
 
         /// <summary>
         /// 
@@ -75,7 +75,7 @@ namespace Lifx_Lan
         /// <summary>
         /// The epoch of the time the firmware was created (See StateHostFirmware (15))
         /// </summary>
-        public UInt64 Firmware_Build { get; }
+        public ulong Firmware_Build { get; }
 
         /// <summary>
         /// 
@@ -85,12 +85,12 @@ namespace Lifx_Lan
         /// <summary>
         /// The minor component of the firmware version (See StateHostFirmware (15))
         /// </summary>
-        public UInt16 Firmware_Version_Minor { get; }
+        public ushort Firmware_Version_Minor { get; }
 
         /// <summary>
         /// The major component of the firmware version (See StateHostFirmware (15))
         /// </summary>
-        public UInt16 Firmware_Version_Major { get; }
+        public ushort Firmware_Version_Major { get; }
 
         /// <summary>
         /// 
@@ -100,10 +100,10 @@ namespace Lifx_Lan
         /// <summary>
         /// 
         /// </summary>
-        public Tile(Int16 accel_meas_x, Int16 accel_meas_y, Int16 accel_meas_z, byte[] reserved6, float user_x, float user_y, byte width, byte height,
-                    byte[] reserved7, UInt32 device_version_vendor, UInt32 device_version_product, byte[] reserved8, UInt64 firmware_build,
-                    byte[] reserved9, UInt16 firmware_version_minor, UInt16 firmware_version_major, byte[] reserved10) 
-        { 
+        public Tile(short accel_meas_x, short accel_meas_y, short accel_meas_z, byte[] reserved6, float user_x, float user_y, byte width, byte height,
+                    byte[] reserved7, uint device_version_vendor, uint device_version_product, byte[] reserved8, ulong firmware_build,
+                    byte[] reserved9, ushort firmware_version_minor, ushort firmware_version_major, byte[] reserved10)
+        {
             Accel_Meas_X = accel_meas_x;
             Accel_Meas_Y = accel_meas_y;
             Accel_Meas_Z = accel_meas_z;

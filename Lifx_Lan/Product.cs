@@ -91,7 +91,7 @@ namespace Lifx_Lan
 
             //JsonSerializer.Deserialize<Product>(productsJson);
             //local copy of https://github.com/LIFX/products/blob/master/products.json or live?
-            //probs local as backup then check for updates
+            //TODO: probs local as backup then check for updates
         }
 
         public void FillCapabilitiesJsonDocument()

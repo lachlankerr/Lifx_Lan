@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Enums
 {
-    internal enum Services : byte
+    internal enum MultiZoneEffectType : byte
     {
-        UDP = 1,
+        OFF = 0,
+        MOVE = 1,
         RESERVED1 = 2,
         RESERVED2 = 3,
-        RESERVED3 = 4,
-        RESERVED4 = 5,
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Packets.Structures
 {
     /// <summary>
     /// This packet represents a single HSBK value. 
@@ -16,28 +16,28 @@ namespace Lifx_Lan
         /// The section of the color spectrum that represents the color of your device. 
         /// So for example red is 0, green is 120, etc
         /// </summary>
-        public UInt16 Hue { get; } = 0;
+        public ushort Hue { get; } = 0;
 
         /// <summary>
         /// How strong the color is. 
         /// So a zero saturation is completely white, whilst full saturation is the full color
         /// </summary>
-        public UInt16 Saturation { get; } = 0;
+        public ushort Saturation { get; } = 0;
 
         /// <summary>
         /// How bright the color is. 
         /// So zero brightness is the same as the device is off, while full brightness be just that.
         /// </summary>
-        public UInt16 Brightness { get; } = 0;
+        public ushort Brightness { get; } = 0;
 
         /// <summary>
         /// The "temperature" when the device has zero saturation. 
         /// So a higher value is a cooler white (more blue) whereas a lower value is a warmer white (more yellow)
         /// </summary>
-        public UInt16 Kelvin { get; } = 0;
+        public ushort Kelvin { get; } = 0;
 
-        public Color(UInt16 hue, UInt16 saturation, UInt16 brightness, UInt16 kelvin) 
-        { 
+        public Color(ushort hue, ushort saturation, ushort brightness, ushort kelvin)
+        {
             Hue = hue;
             Saturation = saturation;
             Brightness = brightness;
@@ -54,15 +54,15 @@ Kelvin: {Kelvin}";
 
         public override bool Equals(object? obj)
         {
-            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            if (obj == null || !GetType().Equals(obj.GetType()))
                 return false;
             else
             {
                 Color color = (Color)obj;
-                return this.Hue == color.Hue &&
-                       this.Saturation == color.Saturation &&
-                       this.Brightness == color.Brightness && 
-                       this.Kelvin == color.Kelvin;
+                return Hue == color.Hue &&
+                       Saturation == color.Saturation &&
+                       Brightness == color.Brightness &&
+                       Kelvin == color.Kelvin;
             }
         }
 

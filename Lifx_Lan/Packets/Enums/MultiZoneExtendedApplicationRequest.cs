@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Enums
 {
     internal enum MultiZoneExtendedApplicationRequest : byte
     {

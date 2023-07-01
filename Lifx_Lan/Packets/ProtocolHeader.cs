@@ -5,8 +5,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lifx_Lan.Packets.Enums;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Packets
 {
     /// <summary>
     /// Protocol Header (12 bytes)
@@ -31,7 +32,7 @@ namespace Lifx_Lan
         /// <summary>
         /// 
         /// </summary>
-        public ProtocolHeader(Pkt_Type pkt_type) 
+        public ProtocolHeader(Pkt_Type pkt_type)
         {
             Pkt_Type = pkt_type;
         }
@@ -52,14 +53,14 @@ namespace Lifx_Lan
 
         public override bool Equals(object? obj)
         {
-            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            if (obj == null || !GetType().Equals(obj.GetType()))
                 return false;
             else
             {
                 ProtocolHeader protocolHeader = (ProtocolHeader)obj;
-                return this.Reserved4.SequenceEqual(protocolHeader.Reserved4) &&
-                       this.Pkt_Type.Equals(protocolHeader.Pkt_Type) && 
-                       this.Reserved5.SequenceEqual(protocolHeader.Reserved5);
+                return Reserved4.SequenceEqual(protocolHeader.Reserved4) &&
+                       Pkt_Type.Equals(protocolHeader.Pkt_Type) &&
+                       Reserved5.SequenceEqual(protocolHeader.Reserved5);
             }
         }
 

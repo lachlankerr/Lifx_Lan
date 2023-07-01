@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Packets.Payloads
 {
     /// <summary>
     /// This packet tell us the version of the firmware on the device. 
@@ -19,13 +19,13 @@ namespace Lifx_Lan
         /// For LIFX products this value is 1. 
         /// There may be devices in the future with a different vendor value.
         /// </summary>
-        public UInt32 Vendor { get; } = 0;
+        public uint Vendor { get; } = 0;
 
         /// <summary>
         /// The product id of the device. 
         /// The available products can be found in our Product Registry.
         /// </summary>
-        public UInt32 Product { get; } = 0;
+        public uint Product { get; } = 0;
 
         /// <summary>
         /// 
@@ -56,14 +56,14 @@ Reserved6: {BitConverter.ToString(Reserved6)}";
 
         public override bool Equals(object? obj)
         {
-            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            if (obj == null || !GetType().Equals(obj.GetType()))
                 return false;
             else
             {
                 StateVersion stateVersion = (StateVersion)obj;
-                return this.Vendor == stateVersion.Vendor &&
-                       this.Product == stateVersion.Product &&
-                       this.Reserved6.SequenceEqual(stateVersion.Reserved6);
+                return Vendor == stateVersion.Vendor &&
+                       Product == stateVersion.Product &&
+                       Reserved6.SequenceEqual(stateVersion.Reserved6);
             }
         }
 
