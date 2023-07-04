@@ -6,6 +6,9 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using Lifx_Lan.Packets;
+using Lifx_Lan.Packets.Enums;
+using Lifx_Lan.Packets.Payloads;
 
 namespace Lifx_Lan
 {
@@ -31,6 +34,8 @@ namespace Lifx_Lan
 
         static async Task Main(string[] args)
         {
+            //Product product = new Product("", 1, 32, 2, 80);
+            //Console.WriteLine(product);
             LifxPacket testPacket = new LifxPacket(target: new byte[] { 0xD0, 0x73, 0xD5, 0x2D, 0x8D, 0xA2, 0x00, 0x00 },
                                                    pkt_type: Pkt_Type.SetPower, 
                                                    payload: new byte[2] { 0xFF, 0xFF },

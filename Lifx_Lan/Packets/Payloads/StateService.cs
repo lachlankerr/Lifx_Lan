@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lifx_Lan.Packets.Enums;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Packets.Payloads
 {
     /// <summary>
     /// This packet is used to tell you what services are available and the port each service is on.
@@ -22,7 +23,7 @@ namespace Lifx_Lan
         /// The port of the service.
         /// This value is usually 56700 but you should not assume this is always the case.
         /// </summary>
-        public UInt32 Port { get; } = 0;
+        public uint Port { get; } = 0;
 
         /// <summary>
         /// Creates an instance of the <see cref="StateService"/> class so we can see the values received from the packet
@@ -38,7 +39,7 @@ namespace Lifx_Lan
             Port = BitConverter.ToUInt32(bytes, 1);
         }
 
-        public StateService(Services service = 0, UInt32 port = 0) 
+        public StateService(Services service = 0, uint port = 0)
         {
             Service = service;
             Port = port;
@@ -52,13 +53,13 @@ Port: {Port}";
 
         public override bool Equals(object? obj)
         {
-            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            if (obj == null || !GetType().Equals(obj.GetType()))
                 return false;
             else
             {
                 StateService stateService = (StateService)obj;
-                return this.Service == stateService.Service && 
-                       this.Port == stateService.Port;
+                return Service == stateService.Service &&
+                       Port == stateService.Port;
             }
         }
 

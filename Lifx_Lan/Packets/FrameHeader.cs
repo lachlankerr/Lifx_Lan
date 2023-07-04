@@ -6,27 +6,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Packets
 {
     /// <summary>
     /// Frame Header (8 bytes)
     /// </summary>
     internal class FrameHeader
     {
-        public const UInt16 MIN_SIZE = 36;
-        public const UInt16 PROTOCOL = 1024;
-        public const UInt32 DEFAULT_SOURCE = 2;
+        public const ushort MIN_SIZE = 36;
+        public const ushort PROTOCOL = 1024;
+        public const uint DEFAULT_SOURCE = 2;
 
         /// <summary>
         /// Size of entire message in bytes including this field.
         /// 36 minimum: frame header 8 + frame address 16 + protocol header 12
         /// </summary>
-        public UInt16 Size { get; } = MIN_SIZE;
+        public ushort Size { get; } = MIN_SIZE;
 
         /// <summary>
         /// Protocol number: must be 1024 (decimal)
         /// </summary>
-        public UInt16 Protocol { get; } = PROTOCOL;
+        public ushort Protocol { get; } = PROTOCOL;
 
         /// <summary>
         /// Message includes a target address: must be one (1)
@@ -56,25 +56,25 @@ namespace Lifx_Lan
         /// In some versions of the firmware a source value of 1 will be ignored. 
         /// If you set source to 0 then the device may broadcast the reply on port 56700 which can be received by all clients on the same subnet and may not be the port on which your client is listening for replies.
         /// </summary>
-        public UInt32 Source { get; } = DEFAULT_SOURCE;
+        public uint Source { get; } = DEFAULT_SOURCE;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="size">Defaults to 36</param>
         /// <param name="tagged">Defaults to false</param>
-        public FrameHeader(UInt16 size = MIN_SIZE, bool tagged = false, UInt32 source = DEFAULT_SOURCE) 
+        public FrameHeader(ushort size = MIN_SIZE, bool tagged = false, uint source = DEFAULT_SOURCE)
         {
             Size = size;
             Tagged = tagged;
             Source = source;
         }
 
-        public FrameHeader(UInt16 size, UInt16 protocol, bool addressable, bool tagged, byte origin, UInt32 source)
+        public FrameHeader(ushort size, ushort protocol, bool addressable, bool tagged, byte origin, uint source)
         {
             Size = size;
-            Protocol = protocol; 
-            Addressable = addressable; 
+            Protocol = protocol;
+            Addressable = addressable;
             Tagged = tagged;
             Origin = new BitArray(new byte[] { origin });
             Origin.Length = 2; //necessary for equals() method to work
@@ -107,17 +107,17 @@ namespace Lifx_Lan
 
         public override bool Equals(object? obj)
         {
-            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            if (obj == null || !GetType().Equals(obj.GetType()))
                 return false;
             else
             {
                 FrameHeader frameHeader = (FrameHeader)obj;
-                return this.Size == frameHeader.Size &&
-                       this.Protocol == frameHeader.Protocol &&
-                       this.Addressable == frameHeader.Addressable &&
-                       this.Tagged == frameHeader.Tagged &&
-                       this.Origin.Xor(frameHeader.Origin).OfType<bool>().All(e => !e) &&
-                       this.Source == frameHeader.Source;
+                return Size == frameHeader.Size &&
+                       Protocol == frameHeader.Protocol &&
+                       Addressable == frameHeader.Addressable &&
+                       Tagged == frameHeader.Tagged &&
+                       Origin.Xor(frameHeader.Origin).OfType<bool>().All(e => !e) &&
+                       Source == frameHeader.Source;
             }
         }
 

@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Packets.Payloads
 {
     /// <summary>
     /// This packet will tell you what version of firmware is on the device.
@@ -23,7 +23,7 @@ namespace Lifx_Lan
         /// <summary>
         /// The timestamp of the firmware that is on the device as an epoch
         /// </summary>
-        public UInt64 Build { get; } = 0;
+        public ulong Build { get; } = 0;
 
         /// <summary>
         /// 
@@ -33,12 +33,12 @@ namespace Lifx_Lan
         /// <summary>
         /// The minor component of the firmware version
         /// </summary>
-        public UInt16 Version_Minor { get; } = 0;
+        public ushort Version_Minor { get; } = 0;
 
         /// <summary>
         /// The major component of the firmware version
         /// </summary>
-        public UInt16 Version_Major { get; } = 0;
+        public ushort Version_Major { get; } = 0;
 
         /// <summary>
         /// Creates an instance of the <see cref="StateHostFirmware"/> class so we can see the values received from the packet
@@ -66,15 +66,15 @@ Version_Major: {Version_Major}";
 
         public override bool Equals(object? obj)
         {
-            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            if (obj == null || !GetType().Equals(obj.GetType()))
                 return false;
             else
             {
                 StateHostFirmware stateHostFirmware = (StateHostFirmware)obj;
-                return this.Build == stateHostFirmware.Build &&
-                       this.Reserved6.SequenceEqual(stateHostFirmware.Reserved6) &&
-                       this.Version_Minor == stateHostFirmware.Version_Minor &&
-                       this.Version_Major == stateHostFirmware.Version_Major;
+                return Build == stateHostFirmware.Build &&
+                       Reserved6.SequenceEqual(stateHostFirmware.Reserved6) &&
+                       Version_Minor == stateHostFirmware.Version_Minor &&
+                       Version_Major == stateHostFirmware.Version_Major;
             }
         }
 

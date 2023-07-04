@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Packets
 {
     /// <summary>
     /// Frame Address (16 bytes)
@@ -74,7 +74,7 @@ namespace Lifx_Lan
             Sequence = sequence;
         }
 
-        public FrameAddress(byte[] target, bool res_required = false, bool ack_required = false, byte sequence = 1) 
+        public FrameAddress(byte[] target, bool res_required = false, bool ack_required = false, byte sequence = 1)
         {
             Target = target;
             Res_Required = res_required;
@@ -122,17 +122,17 @@ namespace Lifx_Lan
 
         public override bool Equals(object? obj)
         {
-            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            if (obj == null || !GetType().Equals(obj.GetType()))
                 return false;
             else
             {
                 FrameAddress frameAddress = (FrameAddress)obj;
-                return this.Target.SequenceEqual(frameAddress.Target) &&
-                       this.Reserved2.SequenceEqual(frameAddress.Reserved2) &&
-                       this.Res_Required == frameAddress.Res_Required &&
-                       this.Ack_Required == frameAddress.Ack_Required &&
-                       this.Reserved3.Xor(frameAddress.Reserved3).OfType<bool>().All(e => !e) &&
-                       this.Sequence == frameAddress.Sequence;
+                return Target.SequenceEqual(frameAddress.Target) &&
+                       Reserved2.SequenceEqual(frameAddress.Reserved2) &&
+                       Res_Required == frameAddress.Res_Required &&
+                       Ack_Required == frameAddress.Ack_Required &&
+                       Reserved3.Xor(frameAddress.Reserved3).OfType<bool>().All(e => !e) &&
+                       Sequence == frameAddress.Sequence;
             }
         }
 

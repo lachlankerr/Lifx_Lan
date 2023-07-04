@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Packets.Enums
 {
-    internal enum MultiZoneExtendedApplicationRequest : byte
+    internal enum MultiZoneApplicationRequest : byte
     {
         NO_APPLY = 0,
         APPLY = 1,

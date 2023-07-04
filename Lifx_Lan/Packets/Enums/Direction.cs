@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Packets.Enums
 {
     internal enum Direction : byte
     {
-        RIGHT = 0, 
+        RIGHT = 0,
         LEFT = 1,
     }
 }

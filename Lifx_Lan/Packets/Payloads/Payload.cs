@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Packets.Payloads
 {
     /// <summary>
     /// Variable length payload
@@ -18,16 +18,16 @@ namespace Lifx_Lan
         /// </summary>
         public byte[] Data { get; } = new byte[0];
 
-        public Payload() 
+        public Payload()
         {
-            
+
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="data"></param>
-        public Payload(byte[] data) 
+        public Payload(byte[] data)
         {
             Data = data;
         }
@@ -43,12 +43,12 @@ namespace Lifx_Lan
 
         public override bool Equals(object? obj)
         {
-            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            if (obj == null || !GetType().Equals(obj.GetType()))
                 return false;
             else
             {
                 Payload payload = (Payload)obj;
-                return this.Data.SequenceEqual(payload.Data);
+                return Data.SequenceEqual(payload.Data);
             }
         }
 

@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lifx_Lan
+namespace Lifx_Lan.Packets.Payloads
 {
     /// <summary>
     /// This packet tells us the label of the device.
@@ -39,12 +39,12 @@ namespace Lifx_Lan
 
         public override bool Equals(object? obj)
         {
-            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            if (obj == null || !GetType().Equals(obj.GetType()))
                 return false;
             else
             {
                 StateLabel stateLabel = (StateLabel)obj;
-                return this.Label.Equals(stateLabel.Label);
+                return Label.Equals(stateLabel.Label);
             }
         }
 
