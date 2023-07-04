@@ -150,7 +150,7 @@ namespace Lifx_Lan
             SendingDiscoveryPacketsCancellation.Cancel();
         }
 
-        public async Task<Device> CreateDeviceFromStateServiceAsync(NetworkInfo networkInfo)
+        public async Task<Device> CreateDeviceFromStateServiceAsync(NetworkInfo networkInfo, int retries = 5)
         {
             if (networkInfo.Packet.ProtocolHeader.Pkt_Type != Pkt_Type.StateService)
                 throw new ArgumentException($"Specified packet was not a StateService, received: {networkInfo.Packet.ProtocolHeader.Pkt_Type}");
@@ -159,20 +159,39 @@ namespace Lifx_Lan
             LifxPacket getVersionPacket         = new LifxPacket(networkInfo.Packet.FrameAddress.Target, Pkt_Type.GetVersion);
             LifxPacket getHostFirmwarePacket    = new LifxPacket(networkInfo.Packet.FrameAddress.Target, Pkt_Type.GetHostFirmware);
 
-            await SendPacketAsync(getLabelPacket, new IPEndPoint(networkInfo.Address, networkInfo.Port), default);
-            await SendPacketAsync(getVersionPacket, new IPEndPoint(networkInfo.Address, networkInfo.Port), default);
-            await SendPacketAsync(getHostFirmwarePacket, new IPEndPoint(networkInfo.Address, networkInfo.Port), default);
+            NetworkInfo? getLabelResponse = null;
+            NetworkInfo? getVersionResponse = null;
+            NetworkInfo? getHostFirmwareResponse = null;
 
-            //todo add a proper delay
-            await Task.Delay(ONE_SECOND / 2);
-            
-            NetworkInfo getLabelResponse        = MatchReplyToRequest(getLabelPacket.FrameHeader.Source, getLabelPacket.FrameAddress.Sequence, getLabelPacket.FrameAddress.Target).First();
-            NetworkInfo getVersionResponse      = MatchReplyToRequest(getVersionPacket.FrameHeader.Source, getVersionPacket.FrameAddress.Sequence, getVersionPacket.FrameAddress.Target).First();
-            NetworkInfo getHostFirmwareResponse = MatchReplyToRequest(getHostFirmwarePacket.FrameHeader.Source, getHostFirmwarePacket.FrameAddress.Sequence, getHostFirmwarePacket.FrameAddress.Target).First();
-            
-            StateLabel stateLabel               = new StateLabel(getLabelResponse.Packet.Payload.ToBytes());
-            StateVersion stateVersion           = new StateVersion(getVersionResponse.Packet.Payload.ToBytes());
-            StateHostFirmware stateHostFirmware = new StateHostFirmware(getHostFirmwareResponse.Packet.Payload.ToBytes());
+            do
+            {
+                if (getLabelResponse == null) await SendPacketAsync(getLabelPacket, new IPEndPoint(networkInfo.Address, networkInfo.Port), default);
+                if (getVersionResponse == null) await SendPacketAsync(getVersionPacket, new IPEndPoint(networkInfo.Address, networkInfo.Port), default);
+                if (getHostFirmwareResponse == null) await SendPacketAsync(getHostFirmwarePacket, new IPEndPoint(networkInfo.Address, networkInfo.Port), default);
+
+                //todo add a proper delay
+                await Task.Delay(ONE_SECOND / 2);
+
+                getLabelResponse = MatchReplyToRequest(getLabelPacket.FrameHeader.Source, getLabelPacket.FrameAddress.Sequence, getLabelPacket.FrameAddress.Target).FirstOrDefault();
+                getVersionResponse = MatchReplyToRequest(getVersionPacket.FrameHeader.Source, getVersionPacket.FrameAddress.Sequence, getVersionPacket.FrameAddress.Target).FirstOrDefault();
+                getHostFirmwareResponse = MatchReplyToRequest(getHostFirmwarePacket.FrameHeader.Source, getHostFirmwarePacket.FrameAddress.Sequence, getHostFirmwarePacket.FrameAddress.Target).FirstOrDefault();
+                retries--;
+            }
+            while (retries > 0 && (getLabelResponse == null || getVersionResponse == null || getHostFirmwareResponse == null));
+
+            if (retries <= 0)
+            {
+                string errorMsg = "";
+                if (getLabelResponse == null) errorMsg += "No response from GetLabel\n";
+                if (getLabelResponse == null) errorMsg += "No response from GetVersion\n";
+                if (getLabelResponse == null) errorMsg += "No response from GetHostFirmware\n";
+                errorMsg += $"on {BitConverter.ToString(networkInfo.Packet.FrameAddress.Target)}";
+                throw new Exception(errorMsg);
+            }
+
+            StateLabel stateLabel               = new StateLabel(getLabelResponse!.Packet.Payload.ToBytes());
+            StateVersion stateVersion           = new StateVersion(getVersionResponse!.Packet.Payload.ToBytes());
+            StateHostFirmware stateHostFirmware = new StateHostFirmware(getHostFirmwareResponse!.Packet.Payload.ToBytes());
 
             Product product = new Product(stateLabel.Label, (int)stateVersion.Vendor, (int)stateVersion.Product, stateHostFirmware.Version_Major, stateHostFirmware.Version_Minor);
             Device device = new Device(networkInfo, product);
