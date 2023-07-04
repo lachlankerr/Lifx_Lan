@@ -28,10 +28,10 @@ namespace Lifx_Lan.Packets
     /// </summary>
     internal class LifxPacket
     {
-        public FrameHeader FrameHeader;
-        public FrameAddress FrameAddress;
-        public ProtocolHeader ProtocolHeader;
-        public Payload Payload;
+        public FrameHeader FrameHeader { get; set; }
+        public FrameAddress FrameAddress { get; set; }
+        public ProtocolHeader ProtocolHeader { get; set; }
+        public Payload Payload { get; set; }
 
         public LifxPacket(Pkt_Type pkt_type, bool tagged = false,
                           uint source = FrameHeader.DEFAULT_SOURCE, bool res_required = false, bool ack_required = false,

@@ -10,13 +10,13 @@ namespace Lifx_Lan
 {
     internal class NetworkInfo
     {
-        public IPAddress Address { get; }
+        public string Address { get; }
 
         public int Port { get; } = Lan.DEFAULT_PORT;
 
         public LifxPacket Packet { get; } 
 
-        public NetworkInfo(IPAddress address, int port, LifxPacket packet)
+        public NetworkInfo(string address, int port, LifxPacket packet)
         {
             Address = address;
             Port = port;
