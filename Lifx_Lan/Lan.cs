@@ -42,8 +42,9 @@ namespace Lifx_Lan
 
             //SaveFoundDevicesToFileAsync(new List<Device>() { dev1 });
             List<Device> devices = await ReadSavedDevicesFromFileAsync();
+            Device dev = devices[1];
             //devices.ForEach(Console.WriteLine);
-            Console.WriteLine(devices[0]);
+            Console.WriteLine(dev);
 
 
             //Console.WriteLine(product);
@@ -85,8 +86,8 @@ namespace Lifx_Lan
             }
 
             SaveFoundDevicesToFileAsync(devices);*/
-            LifxPacket pkt = new LifxPacket(devices[0].NetworkInfo.Packet.FrameAddress.Target, Pkt_Type.GetWifiInfo);
-            IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(devices[0].NetworkInfo.Address), devices[0].NetworkInfo.Port);
+            LifxPacket pkt = new LifxPacket(dev.NetworkInfo.Packet.FrameAddress.Target, Pkt_Type.GetWifiInfo);
+            IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(dev.NetworkInfo.Address), dev.NetworkInfo.Port);
             await lan.SendPacketAsync(pkt, ipep, lan.SendingDiscoveryPacketsCancellation.Token);
 
             Console.WriteLine("Still receiving packets, press enter to exit");
@@ -95,9 +96,12 @@ namespace Lifx_Lan
             lan.StopReceivingPackets();
             await Task.Delay(ONE_SECOND);
 
-            List<NetworkInfo> respones = lan.MatchReplyToRequest(devices[0].NetworkInfo.Packet.FrameHeader.Source, devices[0].NetworkInfo.Packet.FrameAddress.Sequence, devices[0].NetworkInfo.Packet.FrameAddress.Target);
+            //Decoder.PrintFields(pkt.ToBytes());
+            //Decoder.PrintFields(lan.ReceivedPackets[0].Packet.ToBytes());
 
-            Console.WriteLine(new StateWifiInfo(respones[0].Packet.Payload.ToBytes()));
+            List<NetworkInfo> responses = lan.MatchReplyToRequest(pkt.FrameHeader.Source, pkt.FrameAddress.Sequence, pkt.FrameAddress.Target);
+
+            Console.WriteLine(new StateWifiInfo(responses[0].Packet.Payload.ToBytes()));
 
             /*List<Device> savedDevices = await ReadSavedDevicesFromFileAsync();
 
