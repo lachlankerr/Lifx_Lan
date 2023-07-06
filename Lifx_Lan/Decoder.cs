@@ -109,9 +109,9 @@ namespace Lifx_Lan
             return BitConverter.ToBoolean(Mask(data, 22, 1, "01000000"), 0);
         }
 
-        public static byte[] GetReserved3(byte[] data)
+        public static byte GetReserved3(byte[] data)
         {
-            return Mask(data, 22, 1, "00111111");
+            return Mask(data, 22, 1, "00111111")[0];
         }
 
         public static byte GetSequence(byte[] data)
@@ -151,7 +151,7 @@ namespace Lifx_Lan
             Console.WriteLine(@$"Reserved2:     {BitConverter.ToString(GetReserved2(data))}");
             Console.WriteLine(@$"Res_Required:  {GetRes_Required(data)}");
             Console.WriteLine(@$"Ack_Required:  {GetAck_Required(data)}");
-            Console.WriteLine(@$"Reserved3:     {BitConverter.ToString(GetReserved3(data))}");
+            Console.WriteLine(@$"Reserved3:     {GetReserved3(data)}");
             Console.WriteLine(@$"Sequence:      {GetSequence(data)}");
             Console.WriteLine(@$"Reserved4:     {BitConverter.ToString(GetReserved4(data))}");
             Console.WriteLine(@$"Pkt_Type:      {GetPkt_Type(data)} ({(ushort)GetPkt_Type(data)})");

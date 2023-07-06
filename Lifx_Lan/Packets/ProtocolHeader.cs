@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Lifx_Lan.Packets.Enums;
 
@@ -37,6 +38,7 @@ namespace Lifx_Lan.Packets
             Pkt_Type = pkt_type;
         }
 
+        [JsonConstructor]
         public ProtocolHeader(byte[] reserved4, Pkt_Type pkt_type, byte[] reserved5)
         {
             Reserved4 = reserved4;

@@ -23,6 +23,7 @@ namespace Lifx_Lan
         public const int ADDR_SPACE = 15;
         public const int PORT_SPACE = 5;
         public const int PKT_SPACE = 26; //26 max
+        public const string DEVICES_JSON_FILENAME = @"devices.json";
 
         public byte Sequence = 1;
 
@@ -35,14 +36,17 @@ namespace Lifx_Lan
 
         static async Task Main(string[] args)
         {
-            NetworkInfo info = new NetworkInfo("", 0, new LifxPacket(Pkt_Type.GetService, true));
-            Product prod = new Product("", 1, 1, 1, 1);
-            Device dev1 = new Device(info, prod);
+            //NetworkInfo info = new NetworkInfo("", 0, new LifxPacket(Pkt_Type.GetService, true));
+            //Product prod = new Product("", 1, 1, 1, 1);
+            //Device dev1 = new Device(info, prod);
 
-            SaveFoundDevicesToFileAsync(new List<Device>() { dev1 });
+            //SaveFoundDevicesToFileAsync(new List<Device>() { dev1 });
+            //List<Device> devices = await ReadSavedDevicesFromFileAsync();
+            //devices.ForEach(Console.WriteLine);
+
 
             //Console.WriteLine(product);
-            /*LifxPacket testPacket = new LifxPacket(target: new byte[] { 0xD0, 0x73, 0xD5, 0x2D, 0x8D, 0xA2, 0x00, 0x00 },
+            LifxPacket testPacket = new LifxPacket(target: new byte[] { 0xD0, 0x73, 0xD5, 0x2D, 0x8D, 0xA2, 0x00, 0x00 },
                                                    pkt_type: Pkt_Type.SetPower, 
                                                    payload: new byte[2] { 0xFF, 0xFF },
                                                    ack_required: true);
@@ -85,7 +89,15 @@ namespace Lifx_Lan
             Console.ReadLine(); 
 
             lan.StopReceivingPackets();
-            await Task.Delay(ONE_SECOND);*/
+            await Task.Delay(ONE_SECOND);
+
+            List<Device> savedDevices = await ReadSavedDevicesFromFileAsync();
+
+            for (int i = 0; i < savedDevices.Count; i++)
+            {
+                Console.WriteLine(savedDevices[i].Equals(devices[i]));
+            }
+            //devices.ForEach(Console.WriteLine);
 
             Console.ReadLine();
         }
@@ -214,18 +226,27 @@ namespace Lifx_Lan
             return device;
         }
 
-        public static void SaveFoundDevicesToFileAsync(List<Device> devices)
+        public static async void SaveFoundDevicesToFileAsync(List<Device> devices)
         {
-            //using FileStream createStream = File.Create(@"devices.json");
-            //await JsonSerializer.SerializeAsync(createStream, devices, new JsonSerializerOptions { WriteIndented = true });
-            //await createStream.DisposeAsync();
+            using FileStream createStream = File.Create(DEVICES_JSON_FILENAME);
+            await JsonSerializer.SerializeAsync(createStream, devices, new JsonSerializerOptions { WriteIndented = true });
+            await createStream.DisposeAsync();
 
-            string json = JsonSerializer.Serialize(devices, new JsonSerializerOptions { WriteIndented = true });
+            //string json = JsonSerializer.Serialize(devices, new JsonSerializerOptions { WriteIndented = true });
 
-            Console.WriteLine(json);
+            //Console.WriteLine(json);
 
-            List<Device> newDevices = JsonSerializer.Deserialize<List<Device>>(json)!;
-            Console.WriteLine(newDevices);
+            //List<Device> newDevices = JsonSerializer.Deserialize<List<Device>>(json)!;
+            //Console.WriteLine(newDevices[0]);
+            //Console.WriteLine(devices[0].Equals(newDevices[0]));
+        }
+
+        public static async Task<List<Device>> ReadSavedDevicesFromFileAsync()
+        {
+            using FileStream readStream = File.OpenRead(DEVICES_JSON_FILENAME);
+            List<Device>? newDevices = await JsonSerializer.DeserializeAsync<List<Device>>(readStream);
+            await readStream.DisposeAsync();
+            return newDevices!;
         }
 
         public List<NetworkInfo> MatchDiscoveryReplyToRequest(UInt32 source, byte sequence)

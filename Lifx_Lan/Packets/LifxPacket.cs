@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Intrinsics.Arm;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Lifx_Lan.Packets.Enums;
 using Lifx_Lan.Packets.Payloads;
@@ -64,7 +65,7 @@ namespace Lifx_Lan.Packets
         }
 
         public LifxPacket(ushort size, ushort protocol, bool addressable, bool tagged, byte origin, uint source,
-                          byte[] target, byte[] reserved2, bool res_required, bool ack_required, byte[] reserved3, byte sequence,
+                          byte[] target, byte[] reserved2, bool res_required, bool ack_required, byte reserved3, byte sequence,
                           byte[] reserved4, Pkt_Type pkt_type, byte[] reserved5,
                           byte[] payload)
         {
@@ -72,6 +73,15 @@ namespace Lifx_Lan.Packets
             FrameAddress = new FrameAddress(target, reserved2, res_required, ack_required, reserved3, sequence);
             ProtocolHeader = new ProtocolHeader(reserved4, pkt_type, reserved5);
             Payload = new Payload(payload);
+        }
+
+        [JsonConstructor]
+        public LifxPacket(FrameHeader frameHeader, FrameAddress frameAddress, ProtocolHeader protocolHeader, Payload payload) 
+        {
+            FrameHeader = frameHeader;
+            FrameAddress = frameAddress;
+            ProtocolHeader = protocolHeader;
+            Payload = payload;
         }
 
         public byte[] ToBytes()

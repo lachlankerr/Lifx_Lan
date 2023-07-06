@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Lifx_Lan.Packets
@@ -45,7 +46,7 @@ namespace Lifx_Lan.Packets
         /// Message origin indicator: must be zero (0)
         /// Also known as reserved1
         /// </summary>
-        public BitArray Origin { get; } = new BitArray(2);
+        public byte Origin { get; } = 0;
 
         /// <summary>
         /// Source identifier: unique value set by the client, used by responses.
@@ -70,14 +71,14 @@ namespace Lifx_Lan.Packets
             Source = source;
         }
 
+        [JsonConstructor]
         public FrameHeader(ushort size, ushort protocol, bool addressable, bool tagged, byte origin, uint source)
         {
             Size = size;
             Protocol = protocol;
             Addressable = addressable;
             Tagged = tagged;
-            Origin = new BitArray(new byte[] { origin });
-            Origin.Length = 2; //necessary for equals() method to work
+            Origin = origin;
             Source = source;
         }
 
@@ -89,10 +90,13 @@ namespace Lifx_Lan.Packets
 
             BitArray protocolBits = new BitArray(protocolBytes);
 
+            BitArray originBits = new BitArray(new byte[] { Origin });
+            originBits.Length = 2; //ignore other bits
+
             protocolBits.Set(8 + 4, Addressable);
             protocolBits.Set(8 + 5, Tagged);
-            protocolBits.Set(8 + 6, Origin[1]);
-            protocolBits.Set(8 + 7, Origin[0]);
+            protocolBits.Set(8 + 6, originBits[1]);
+            protocolBits.Set(8 + 7, originBits[0]);
             protocolBits.CopyTo(protocolBytes, 0);
 
             /*for (int i = 0; i < 16; i++)
@@ -116,7 +120,7 @@ namespace Lifx_Lan.Packets
                        Protocol == frameHeader.Protocol &&
                        Addressable == frameHeader.Addressable &&
                        Tagged == frameHeader.Tagged &&
-                       Origin.Xor(frameHeader.Origin).OfType<bool>().All(e => !e) &&
+                       Origin == frameHeader.Origin &&
                        Source == frameHeader.Source;
             }
         }

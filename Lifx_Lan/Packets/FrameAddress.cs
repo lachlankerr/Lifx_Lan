@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Lifx_Lan.Packets
@@ -53,7 +54,7 @@ namespace Lifx_Lan.Packets
         /// <summary>
         /// Any fields named reserved should be set to all 0s.
         /// </summary>
-        public BitArray Reserved3 { get; } = new BitArray(6);
+        public byte Reserved3 { get; } = 0;
 
         /// <summary>
         /// Wrap around message sequence number
@@ -82,14 +83,14 @@ namespace Lifx_Lan.Packets
             Sequence = sequence;
         }
 
-        public FrameAddress(byte[] target, byte[] reserved2, bool res_required, bool ack_required, byte[] reserved3, byte sequence)
+        [JsonConstructor]
+        public FrameAddress(byte[] target, byte[] reserved2, bool res_required, bool ack_required, byte reserved3, byte sequence)
         {
             Target = target;
             Reserved2 = reserved2;
             Res_Required = res_required;
             Ack_Required = ack_required;
-            Reserved3 = new BitArray(reserved3);
-            Reserved3.Length = 6; //necessary for equals() method to work
+            Reserved3 = reserved3;
             Sequence = sequence;
         }
 
@@ -100,14 +101,18 @@ namespace Lifx_Lan.Packets
 
             BitArray reservedBits = new BitArray(reservedByte);
 
+
+            BitArray reserved3Bits = new BitArray(Reserved3);
+            reserved3Bits.Length = 6; //ignore the last 2 bits
+
             reservedBits.Set(0, Res_Required);
             reservedBits.Set(1, Ack_Required);
-            reservedBits.Set(2, Reserved3[5]);
-            reservedBits.Set(3, Reserved3[4]);
-            reservedBits.Set(4, Reserved3[3]);
-            reservedBits.Set(5, Reserved3[2]);
-            reservedBits.Set(6, Reserved3[1]);
-            reservedBits.Set(7, Reserved3[0]);
+            reservedBits.Set(2, reserved3Bits[5]);
+            reservedBits.Set(3, reserved3Bits[4]);
+            reservedBits.Set(4, reserved3Bits[3]);
+            reservedBits.Set(5, reserved3Bits[2]);
+            reservedBits.Set(6, reserved3Bits[1]);
+            reservedBits.Set(7, reserved3Bits[0]);
             reservedBits.CopyTo(reservedByte, 0);
 
             /*for (int i = 0; i < 16; i++)
@@ -131,7 +136,7 @@ namespace Lifx_Lan.Packets
                        Reserved2.SequenceEqual(frameAddress.Reserved2) &&
                        Res_Required == frameAddress.Res_Required &&
                        Ack_Required == frameAddress.Ack_Required &&
-                       Reserved3.Xor(frameAddress.Reserved3).OfType<bool>().All(e => !e) &&
+                       Reserved3 == frameAddress.Reserved3 &&
                        Sequence == frameAddress.Sequence;
             }
         }
