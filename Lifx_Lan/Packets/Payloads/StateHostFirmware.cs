@@ -17,6 +17,8 @@ namespace Lifx_Lan.Packets.Payloads
     /// This means that (2, 80) is considered less than (3, 60) and (3, 70) is considered greater.
     /// 
     /// LIFX products will specify a different major for each generation of our devices.
+    /// 
+    /// This packet is the reply to the GetHostFirmware (14) message
     /// </summary>
     internal class StateHostFirmware
     {

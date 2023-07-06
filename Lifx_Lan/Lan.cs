@@ -41,15 +41,16 @@ namespace Lifx_Lan
             //Device dev1 = new Device(info, prod);
 
             //SaveFoundDevicesToFileAsync(new List<Device>() { dev1 });
-            //List<Device> devices = await ReadSavedDevicesFromFileAsync();
+            List<Device> devices = await ReadSavedDevicesFromFileAsync();
             //devices.ForEach(Console.WriteLine);
+            Console.WriteLine(devices[0]);
 
 
             //Console.WriteLine(product);
-            LifxPacket testPacket = new LifxPacket(target: new byte[] { 0xD0, 0x73, 0xD5, 0x2D, 0x8D, 0xA2, 0x00, 0x00 },
-                                                   pkt_type: Pkt_Type.SetPower, 
-                                                   payload: new byte[2] { 0xFF, 0xFF },
-                                                   ack_required: true);
+            //LifxPacket testPacket = new LifxPacket(target: new byte[] { 0xD0, 0x73, 0xD5, 0x2D, 0x8D, 0xA2, 0x00, 0x00 },
+            //                                       pkt_type: Pkt_Type.SetPower, 
+            //                                       payload: new byte[2] { 0xFF, 0xFF },
+            //                                       ack_required: true);
 
             //Decoder.PrintFields(new byte[] { 0x24, 0x00, 0x00, 0x34, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00 });
 
@@ -62,9 +63,9 @@ namespace Lifx_Lan
             //lan.GetProductInfo(networkInfos);
             //Console.WriteLine(new Product(1, 30, 3, 90));
             lan.StartReceivingPacketsAsync();
-            lan.StartSendingDiscoveryPacketsAsync();
+            //lan.StartSendingDiscoveryPacketsAsync();
 
-            Console.WriteLine("Press enter to stop sending discovery packets");
+            /*Console.WriteLine("Press enter to stop sending discovery packets");
             Console.ReadLine();
 
             lan.StopSendingDiscoveryPackets();
@@ -83,7 +84,10 @@ namespace Lifx_Lan
                 }
             }
 
-            SaveFoundDevicesToFileAsync(devices);
+            SaveFoundDevicesToFileAsync(devices);*/
+            LifxPacket pkt = new LifxPacket(devices[0].NetworkInfo.Packet.FrameAddress.Target, Pkt_Type.GetWifiInfo);
+            IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(devices[0].NetworkInfo.Address), devices[0].NetworkInfo.Port);
+            await lan.SendPacketAsync(pkt, ipep, lan.SendingDiscoveryPacketsCancellation.Token);
 
             Console.WriteLine("Still receiving packets, press enter to exit");
             Console.ReadLine(); 
@@ -91,13 +95,17 @@ namespace Lifx_Lan
             lan.StopReceivingPackets();
             await Task.Delay(ONE_SECOND);
 
-            List<Device> savedDevices = await ReadSavedDevicesFromFileAsync();
+            List<NetworkInfo> respones = lan.MatchReplyToRequest(devices[0].NetworkInfo.Packet.FrameHeader.Source, devices[0].NetworkInfo.Packet.FrameAddress.Sequence, devices[0].NetworkInfo.Packet.FrameAddress.Target);
+
+            Console.WriteLine(new StateWifiInfo(respones[0].Packet.Payload.ToBytes()));
+
+            /*List<Device> savedDevices = await ReadSavedDevicesFromFileAsync();
 
             for (int i = 0; i < savedDevices.Count; i++)
             {
                 Console.WriteLine(savedDevices[i].Equals(devices[i]));
-            }
-            //devices.ForEach(Console.WriteLine);
+            }*/
+            //devices.ForEach(Console.WriteLine);*/
 
             Console.ReadLine();
         }
