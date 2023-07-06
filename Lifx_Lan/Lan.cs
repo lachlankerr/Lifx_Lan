@@ -35,9 +35,14 @@ namespace Lifx_Lan
 
         static async Task Main(string[] args)
         {
-            //Product product = new Product("", 1, 32, 2, 80);
+            NetworkInfo info = new NetworkInfo("", 0, new LifxPacket(Pkt_Type.GetService, true));
+            Product prod = new Product("", 1, 1, 1, 1);
+            Device dev1 = new Device(info, prod);
+
+            SaveFoundDevicesToFileAsync(new List<Device>() { dev1 });
+
             //Console.WriteLine(product);
-            LifxPacket testPacket = new LifxPacket(target: new byte[] { 0xD0, 0x73, 0xD5, 0x2D, 0x8D, 0xA2, 0x00, 0x00 },
+            /*LifxPacket testPacket = new LifxPacket(target: new byte[] { 0xD0, 0x73, 0xD5, 0x2D, 0x8D, 0xA2, 0x00, 0x00 },
                                                    pkt_type: Pkt_Type.SetPower, 
                                                    payload: new byte[2] { 0xFF, 0xFF },
                                                    ack_required: true);
@@ -80,7 +85,9 @@ namespace Lifx_Lan
             Console.ReadLine(); 
 
             lan.StopReceivingPackets();
-            await Task.Delay(ONE_SECOND);
+            await Task.Delay(ONE_SECOND);*/
+
+            Console.ReadLine();
         }
 
         public Lan()
@@ -207,18 +214,18 @@ namespace Lifx_Lan
             return device;
         }
 
-        public static async void SaveFoundDevicesToFileAsync(List<Device> devices)
+        public static void SaveFoundDevicesToFileAsync(List<Device> devices)
         {
-            using FileStream createStream = File.Create(@"devices.json");
-            await JsonSerializer.SerializeAsync(createStream, devices, new JsonSerializerOptions { WriteIndented = true });
-            await createStream.DisposeAsync();
+            //using FileStream createStream = File.Create(@"devices.json");
+            //await JsonSerializer.SerializeAsync(createStream, devices, new JsonSerializerOptions { WriteIndented = true });
+            //await createStream.DisposeAsync();
 
-            //string json = JsonSerializer.Serialize(devices, new JsonSerializerOptions { WriteIndented = true });
+            string json = JsonSerializer.Serialize(devices, new JsonSerializerOptions { WriteIndented = true });
 
-            //Console.WriteLine(json);
+            Console.WriteLine(json);
 
-            //List<Device> newDevices = JsonSerializer.Deserialize<List<Device>>(json)!;
-            //Console.WriteLine(newDevices);
+            List<Device> newDevices = JsonSerializer.Deserialize<List<Device>>(json)!;
+            Console.WriteLine(newDevices);
         }
 
         public List<NetworkInfo> MatchDiscoveryReplyToRequest(UInt32 source, byte sequence)
