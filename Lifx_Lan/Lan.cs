@@ -89,7 +89,7 @@ namespace Lifx_Lan
                 Console.WriteLine(dev.Product.Label);
                 try
                 {
-                    Console.WriteLine(new StateGroup(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetGroup)));
+                    Console.WriteLine(new EchoResponse(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.EchoRequest, new byte[] { 0xFF, 0x00, 0xFF })));
                 }
                 catch (TimeoutException ex)
                 {
@@ -120,9 +120,9 @@ namespace Lifx_Lan
             Console.ReadLine();
         }
 
-        public async Task<byte[]> SendToDeviceThenReceiveAsync(Device device, Pkt_Type pkt_type, int waits = 10)
+        public async Task<byte[]> SendToDeviceThenReceiveAsync(Device device, Pkt_Type pkt_type, byte[] payload, int waits = 10)
         {
-            LifxPacket pkt = new LifxPacket(device.NetworkInfo.Packet.FrameAddress.Target, pkt_type);
+            LifxPacket pkt = new LifxPacket(device.NetworkInfo.Packet.FrameAddress.Target, pkt_type, payload);
             IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(device.NetworkInfo.Address), device.NetworkInfo.Port);
             await SendPacketAsync(pkt, ipep, SendingPacketsCancellation.Token);
 
@@ -139,6 +139,11 @@ namespace Lifx_Lan
                 throw new TimeoutException("No response received");
 
             return responses[0].Packet.Payload.ToBytes();
+        }
+
+        public async Task<byte[]> SendToDeviceThenReceiveAsync(Device device, Pkt_Type pkt_type, int waits = 10)
+        {
+            return await SendToDeviceThenReceiveAsync(device, pkt_type, new byte[0], waits);
         }
 
         public Lan()
