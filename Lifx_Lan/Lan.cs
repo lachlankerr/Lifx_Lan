@@ -89,9 +89,9 @@ namespace Lifx_Lan
                 Console.WriteLine(dev.Product.Label);
                 try
                 {
-                    Console.WriteLine(new EchoResponse(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.EchoRequest, new byte[] { 0xFF, 0x00, 0xFF })));
+                    Console.WriteLine(new StateUnhandled(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetColor, new byte[] { })));
                 }
-                catch (TimeoutException ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 }

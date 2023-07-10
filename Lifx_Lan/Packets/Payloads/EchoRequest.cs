@@ -13,7 +13,7 @@ namespace Lifx_Lan.Packets.Payloads
     /// 
     /// Will return one EchoResponse (59) message
     /// </summary>
-    internal class EchoRequest : Payload, IReceivable
+    internal class EchoRequest : Payload, ISendable
     {
         /// <summary>
         /// The bytes you want to receive in the EchoResponse (59) message.
