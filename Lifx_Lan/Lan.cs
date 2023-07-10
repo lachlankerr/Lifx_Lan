@@ -89,7 +89,7 @@ namespace Lifx_Lan
                 Console.WriteLine(dev.Product.Label);
                 try
                 {
-                    Console.WriteLine(new StateInfo(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetInfo)));
+                    Console.WriteLine(new StateGroup(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetGroup)));
                 }
                 catch (TimeoutException ex)
                 {

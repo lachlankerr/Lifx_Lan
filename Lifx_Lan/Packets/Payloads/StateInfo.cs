@@ -45,7 +45,7 @@ namespace Lifx_Lan.Packets.Payloads
             Downtime = BitConverter.ToUInt64(bytes, 16);
         }
 
-        private string HumanReadableTimespan(TimeSpan ts)
+        private static string HumanReadableTimespan(TimeSpan ts)
         {
             string timeString = "";
             if (ts.TotalDays >= 1) { timeString += $" {ts.Days} day(s),"; }
