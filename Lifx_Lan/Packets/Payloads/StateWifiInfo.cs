@@ -14,6 +14,9 @@ namespace Lifx_Lan.Packets.Payloads
     /// </summary>
     internal class StateWifiInfo
     {
+        /// <summary>
+        /// The signal strength of the device.
+        /// </summary>
         public float Signal { get; } = 0;
 
         public byte[] Reserved6 { get; } = new byte[4];
