@@ -13,7 +13,7 @@ namespace Lifx_Lan.Packets.Payloads
     /// 
     /// This packet is the reply to the GetVersion (32) message.
     /// </summary>
-    internal class StateVersion
+    internal class StateVersion : Payload, IReceivable
     {
         /// <summary>
         /// For LIFX products this value is 1. 
@@ -37,7 +37,7 @@ namespace Lifx_Lan.Packets.Payloads
         /// </summary>
         /// <param name="bytes">The payload data from the received <see cref="StateVersion"/> packet</param>
         /// <exception cref="ArgumentException"></exception>
-        public StateVersion(byte[] bytes)
+        public StateVersion(byte[] bytes) : base(bytes)
         {
             if (bytes.Length != 12)
                 throw new ArgumentException("Wrong number of bytes for this payload type, expected 12");

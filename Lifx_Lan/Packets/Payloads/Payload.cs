@@ -14,9 +14,9 @@ namespace Lifx_Lan.Packets.Payloads
     internal class Payload
     {
         /// <summary>
-        /// 
+        /// The payload data as a byte array.
         /// </summary>
-        public byte[] Data { get; } = new byte[0];
+        public byte[] Bytes { get; } = new byte[0];
 
         public Payload()
         {
@@ -24,12 +24,13 @@ namespace Lifx_Lan.Packets.Payloads
         }
 
         /// <summary>
-        /// 
+        /// Creates an instance of the <see cref="Payload"/> class so we can see the values received from the packet
         /// </summary>
-        /// <param name="data"></param>
-        public Payload(byte[] data)
+        /// <param name="bytes">The payload data from the received <see cref="Payload"/> packet</param>
+        /// <exception cref="ArgumentException"></exception>
+        public Payload(byte[] bytes)
         {
-            Data = data;
+            Bytes = bytes;
         }
 
         /// <summary>
@@ -38,7 +39,12 @@ namespace Lifx_Lan.Packets.Payloads
         /// <returns></returns>
         public byte[] ToBytes()
         {
-            return Data;
+            return Bytes;
+        }
+
+        public override string ToString()
+        {
+            return $@"Data: {BitConverter.ToString(Bytes)}";
         }
 
         public override bool Equals(object? obj)
@@ -48,13 +54,13 @@ namespace Lifx_Lan.Packets.Payloads
             else
             {
                 Payload payload = (Payload)obj;
-                return Data.SequenceEqual(payload.Data);
+                return Bytes.SequenceEqual(payload.Bytes);
             }
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Data);
+            return HashCode.Combine(Bytes);
         }
     }
 }

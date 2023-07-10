@@ -12,7 +12,7 @@ namespace Lifx_Lan.Packets.Payloads
     /// 
     /// This packet is the reply to the GetLabel (23) and SetLabel (24) messages
     /// </summary>
-    internal class StateLabel
+    internal class StateLabel : Payload, IReceivable
     {
         /// <summary>
         /// The label of the device
@@ -24,7 +24,7 @@ namespace Lifx_Lan.Packets.Payloads
         /// </summary>
         /// <param name="bytes">The payload data from the received <see cref="StateLabel"/> packet</param>
         /// <exception cref="ArgumentException"></exception>
-        public StateLabel(byte[] bytes)
+        public StateLabel(byte[] bytes) : base(bytes)
         {
             if (bytes.Length != 32)
                 throw new ArgumentException("Wrong number of bytes for this payload type, expected 32");

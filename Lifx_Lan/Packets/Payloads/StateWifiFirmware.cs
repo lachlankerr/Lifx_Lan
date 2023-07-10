@@ -9,7 +9,7 @@ namespace Lifx_Lan.Packets.Payloads
     /// <summary>
     /// This packet is the reply to the GetWifiFirmware (18) message
     /// </summary>
-    internal class StateWifiFirmware
+    internal class StateWifiFirmware : Payload, IReceivable
     {
         /// <summary>
         /// The timestamp when the wifi firmware was created as an epoch, This is only relevant for the first two generations of our products.
@@ -28,7 +28,12 @@ namespace Lifx_Lan.Packets.Payloads
         /// </summary>
         public ushort Version_Major { get; } = 0;
 
-        public StateWifiFirmware(byte[] bytes)
+        /// <summary>
+        /// Creates an instance of the <see cref="StateWifiFirmware"/> class so we can see the values received from the packet
+        /// </summary>
+        /// <param name="bytes">The payload data from the received <see cref="StateWifiFirmware"/> packet</param>
+        /// <exception cref="ArgumentException"></exception>
+        public StateWifiFirmware(byte[] bytes) : base(bytes)
         {
             if (bytes.Length != 20)
                 throw new ArgumentException("Wrong number of bytes for this payload type, expected 20");

@@ -20,7 +20,7 @@ namespace Lifx_Lan.Packets.Payloads
     /// 
     /// This packet is the reply to the GetHostFirmware (14) message
     /// </summary>
-    internal class StateHostFirmware
+    internal class StateHostFirmware : Payload, IReceivable
     {
         /// <summary>
         /// The timestamp of the firmware that is on the device as an epoch
@@ -47,7 +47,7 @@ namespace Lifx_Lan.Packets.Payloads
         /// </summary>
         /// <param name="bytes">The payload data from the received <see cref="StateHostFirmware"/> packet</param>
         /// <exception cref="ArgumentException"></exception>
-        public StateHostFirmware(byte[] bytes)
+        public StateHostFirmware(byte[] bytes) : base(bytes)
         {
             if (bytes.Length != 20)
                 throw new ArgumentException("Wrong number of bytes for this payload type, expected 20");

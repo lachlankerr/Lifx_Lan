@@ -12,7 +12,7 @@ namespace Lifx_Lan.Packets.Payloads
     /// 
     /// This packet is the reply to the GetService (2) message
     /// </summary>
-    internal class StateService
+    internal class StateService : Payload, IReceivable
     {
         /// <summary>
         /// Using Services Enum
@@ -30,7 +30,7 @@ namespace Lifx_Lan.Packets.Payloads
         /// </summary>
         /// <param name="bytes">The payload data from the received <see cref="StateService"/> packet</param>
         /// <exception cref="ArgumentException"></exception>
-        public StateService(byte[] bytes)
+        public StateService(byte[] bytes) : base(bytes)
         {
             if (bytes.Length != 5)
                 throw new ArgumentException("Wrong number of bytes for this payload type, expected 5");

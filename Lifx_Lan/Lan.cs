@@ -86,8 +86,15 @@ namespace Lifx_Lan
             SaveFoundDevicesToFileAsync(devices);*/
             foreach (Device dev in devices)
             {
-                Console.WriteLine(dev);
-                Console.WriteLine(new StateWifiFirmware(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetWifiFirmware)));
+                Console.WriteLine(dev.Product.Label);
+                try
+                {
+                    Console.WriteLine(new StateInfo(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetInfo)));
+                }
+                catch (TimeoutException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
                 Console.WriteLine();
             }
 
@@ -113,7 +120,7 @@ namespace Lifx_Lan
             Console.ReadLine();
         }
 
-        public async Task<byte[]> SendToDeviceThenReceiveAsync(Device device, Pkt_Type pkt_type, int retries = 10)
+        public async Task<byte[]> SendToDeviceThenReceiveAsync(Device device, Pkt_Type pkt_type, int waits = 10)
         {
             LifxPacket pkt = new LifxPacket(device.NetworkInfo.Packet.FrameAddress.Target, pkt_type);
             IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(device.NetworkInfo.Address), device.NetworkInfo.Port);
@@ -124,11 +131,11 @@ namespace Lifx_Lan
             {
                 await Task.Delay(ONE_SECOND / 2);
                 responses = MatchReplyToRequest(pkt.FrameHeader.Source, pkt.FrameAddress.Sequence, pkt.FrameAddress.Target);
-                retries--;
+                waits--;
             }
-            while (retries > 0 && responses.Count == 0);
+            while (waits > 0 && responses.Count == 0);
 
-            if (retries <= 0)
+            if (waits <= 0)
                 throw new TimeoutException("No response received");
 
             return responses[0].Packet.Payload.ToBytes();
@@ -184,6 +191,7 @@ namespace Lifx_Lan
                 }
             }
         }
+
         public void StopReceivingPackets()
         {
             Debug.WriteLine("Stop receiving packets");
@@ -376,7 +384,7 @@ namespace Lifx_Lan
         /// <param name="timeoutPerRun">How long to wait for responses in milliseconds until starting next run</param>
         /// <param name="maxRuns">The maximum number of discovery packets to run if we have not found numDevices yet</param>
         /// <param name="numDevices">The total number of devices we are looking for, set to zero if it is an unknown number</param>
-        public List<NetworkInfo> Discovery(int timeoutPerRun = ONE_SECOND, int maxRuns = 5, int numDevices = 0, bool printMessages = false)
+        /*public List<NetworkInfo> Discovery(int timeoutPerRun = ONE_SECOND, int maxRuns = 5, int numDevices = 0, bool printMessages = false)
         {
             if (printMessages)
                 Console.WriteLine($"Looking for {numDevices} devices, max amount of runs is {maxRuns}, timeout per run is {timeoutPerRun} milliseconds");
@@ -424,7 +432,7 @@ namespace Lifx_Lan
                         if (receivedPacket.ProtocolHeader.Pkt_Type == Pkt_Type.StateService)
                         {
                             //Decoder.PrintFields(receivedBytes);
-                            StateService stateService = new StateService(receivedPacket.Payload.Data);
+                            StateService stateService = new StateService(receivedPacket.Payload.Bytes);
                             //Console.WriteLine(stateService.Service);
                             //Console.WriteLine(stateService.Port);
 
@@ -452,9 +460,9 @@ namespace Lifx_Lan
                 }
 
             return networkInfos;
-        }
+        }*/
 
-        public void GetProductInfo(List<NetworkInfo> networkInfos)
+        /*public void GetProductInfo(List<NetworkInfo> networkInfos)
         {
             foreach (NetworkInfo networkInfo in networkInfos)
             {
@@ -462,7 +470,7 @@ namespace Lifx_Lan
                 SendPacket(getVersionPacket, new IPEndPoint(IPAddress.Parse(networkInfo.Address), networkInfo.Port));
                 //ReceivePacket();
             }
-        }
+        }*/
 
         /// <summary>
         /// Sends the specified <see cref="LifxPacket"/> to the specified ip on the specified port.
@@ -470,7 +478,7 @@ namespace Lifx_Lan
         /// <param name="packet">The <see cref="LifxPacket"/> to send to the device</param>
         /// <param name="addr">The ip address and port to send our packet to</param>
         /// <returns>The number of bytes sent</returns>
-        public int SendPacket(LifxPacket packet, IPEndPoint addr)
+        /*public int SendPacket(LifxPacket packet, IPEndPoint addr)
         {
             unchecked { packet.FrameAddress.Sequence = Sequence++; }
             if (Decoder.IsValid(packet.ToBytes())) //no point sending useless data that might damage our devices
@@ -490,10 +498,13 @@ namespace Lifx_Lan
                 }
             }
             return 0;
-        }
+        }*/
 
         public async Task<int> SendPacketAsync(LifxPacket packet, IPEndPoint addr, CancellationToken cancellationToken)
         {
+            //if (!typeof(ISendable).IsAssignableFrom(packet.Payload.GetType()))
+            //    throw new ArgumentException($"Payload type {packet.Payload.GetType()} cannot be sent");
+
             unchecked { packet.FrameAddress.Sequence = Sequence++; }
             if (Decoder.IsValid(packet.ToBytes())) //no point sending useless data that might damage our devices
             {
@@ -518,7 +529,7 @@ namespace Lifx_Lan
         /// </summary>
         /// <param name="port">The port number we are waiting for a response on</param>
         /// <returns></returns>
-        public LifxPacket ReceivePacket(bool printMessages = false)
+        /*public LifxPacket ReceivePacket(bool printMessages = false)
         {
             LifxPacket receivedPacket;
             Console.WriteLine("\nWaiting for response...");
@@ -549,6 +560,6 @@ namespace Lifx_Lan
                 throw new Exception("Received non-lifx packet: " + BitConverter.ToString(receivedBytes) + " from " + RemoteIpEndPoint.Address.ToString() + " on their port number " + RemoteIpEndPoint.Port.ToString());
             }
             return receivedPacket;
-        }
+        }*/
     }
 }

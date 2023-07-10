@@ -12,7 +12,7 @@ namespace Lifx_Lan.Packets.Payloads
     /// 
     /// This packet is the reply to the GetWifiInfo (16) message
     /// </summary>
-    internal class StateWifiInfo
+    internal class StateWifiInfo : Payload, IReceivable
     {
         /// <summary>
         /// The signal strength of the device.
@@ -30,7 +30,7 @@ namespace Lifx_Lan.Packets.Payloads
         /// </summary>
         /// <param name="bytes">The payload data from the received <see cref="StateWifiInfo"/> packet</param>
         /// <exception cref="ArgumentException"></exception>
-        public StateWifiInfo(byte[] bytes) 
+        public StateWifiInfo(byte[] bytes) : base(bytes)
         {
             if (bytes.Length != 14)
                 throw new ArgumentException("Wrong number of bytes for this payload type, expected 14");
