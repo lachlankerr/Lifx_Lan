@@ -20,6 +20,11 @@ namespace Lifx_Lan.Packets.Payloads
         /// </summary>
         public ushort Level { get; } = 0;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="StatePower"/> class so we can see the values received from the packet
+        /// </summary>
+        /// <param name="bytes">The payload data from the received <see cref="StatePower"/> packet</param>
+        /// <exception cref="ArgumentException"></exception>
         public StatePower(byte[] bytes) : base (bytes)
         {
             if (bytes.Length != 2)
