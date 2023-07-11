@@ -89,7 +89,7 @@ namespace Lifx_Lan
                 Console.WriteLine(dev.Product.Label);
                 try
                 {
-                    Console.WriteLine(new StateUnhandled(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetColor, new byte[] { })));
+                    Console.WriteLine(new LightState(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetColor, new byte[] { })));
                 }
                 catch (Exception ex)
                 {
