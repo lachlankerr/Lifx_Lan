@@ -42,7 +42,6 @@ namespace Lifx_Lan
             //Device dev1 = new Device(info, prod);
 
             //SaveFoundDevicesToFileAsync(new List<Device>() { dev1 });
-            List<Device> devices = await ReadSavedDevicesFromFileAsync();
 
 
             //Console.WriteLine(product);
@@ -53,7 +52,6 @@ namespace Lifx_Lan
 
             //Decoder.PrintFields(new byte[] { 0x24, 0x00, 0x00, 0x34, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00 });
 
-            Lan lan = new Lan();
 
             //lan.SendPacket(testPacket, new IPEndPoint(IPAddress.Parse("192.168.10.25"), DEFAULT_PORT), printMessages: true);
             //lan.ReceivePacket(printMessages: true);
@@ -61,7 +59,6 @@ namespace Lifx_Lan
             //List<NetworkInfo> networkInfos = lan.Discovery(ONE_SECOND * 1, 5, 5, true);
             //lan.GetProductInfo(networkInfos);
             //Console.WriteLine(new Product(1, 30, 3, 90));
-            lan.StartReceivingPacketsAsync();
             //lan.StartSendingDiscoveryPacketsAsync();
 
             /*Console.WriteLine("Press enter to stop sending discovery packets");
@@ -84,6 +81,9 @@ namespace Lifx_Lan
             }
 
             SaveFoundDevicesToFileAsync(devices);*/
+            /*List<Device> devices = await ReadSavedDevicesFromFileAsync();
+            Lan lan = new Lan();
+            lan.StartReceivingPacketsAsync();
             foreach (Device dev in devices)
             {
                 Console.WriteLine(dev.Product.Label);
@@ -102,7 +102,7 @@ namespace Lifx_Lan
             Console.ReadLine(); 
 
             lan.StopReceivingPackets();
-            await Task.Delay(ONE_SECOND);
+            await Task.Delay(ONE_SECOND);*/
 
             //Decoder.PrintFields(pkt.ToBytes());
             //Decoder.PrintFields(lan.ReceivedPackets[0].Packet.ToBytes());
@@ -116,6 +116,17 @@ namespace Lifx_Lan
                 Console.WriteLine(savedDevices[i].Equals(devices[i]));
             }*/
             //devices.ForEach(Console.WriteLine);*/
+
+            StateMultiZone state = new StateMultiZone(new byte[] { 0x00, 0x00,
+            0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00,
+            0x02, 0x00, 0x02, 0x00, 0x02, 0x00, 0x02, 0x00,
+            0x03, 0x00, 0x03, 0x00, 0x03, 0x00, 0x03, 0x00,
+            0x04, 0x00, 0x04, 0x00, 0x04, 0x00, 0x04, 0x00,
+            0x05, 0x00, 0x05, 0x00, 0x05, 0x00, 0x05, 0x00,
+            0x06, 0x00, 0x06, 0x00, 0x06, 0x00, 0x06, 0x00,
+            0x07, 0x00, 0x07, 0x00, 0x07, 0x00, 0x07, 0x00,
+            0x08, 0x00, 0x08, 0x00, 0x08, 0x00, 0x08, 0x00, });
+            Console.WriteLine(state);
 
             Console.ReadLine();
         }
