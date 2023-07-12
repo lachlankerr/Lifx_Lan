@@ -36,7 +36,7 @@ namespace Lifx_Lan.Packets.Payloads
             if (bytes.Length != 5)
                 throw new ArgumentException("Wrong number of bytes for this payload type, expected 5");
 
-            Indication = bytes.Skip(0).Take(1).ToArray()[0];
+            Indication = bytes[0];
             Duration_S = BitConverter.ToUInt32(bytes, 1);
         }
 

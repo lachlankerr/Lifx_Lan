@@ -44,7 +44,7 @@ namespace Lifx_Lan.Packets.Payloads
 
             Duration_S = BitConverter.ToUInt32(bytes, 0);
             Remaining_S = BitConverter.ToUInt32(bytes, 4);
-            Last_Power = bytes.Skip(8).Take(1).ToArray()[0];
+            Last_Power = bytes[8];
         }
 
         public override string ToString()

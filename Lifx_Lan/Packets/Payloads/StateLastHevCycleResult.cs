@@ -32,7 +32,7 @@ namespace Lifx_Lan.Packets.Payloads
             if (bytes.Length != 1)
                 throw new ArgumentException("Wrong number of bytes for this payload type, expected 1");
 
-            Result = (LightLastHevCycleResult)bytes.Skip(0).Take(1).ToArray()[0];
+            Result = (LightLastHevCycleResult)bytes[0];
         }
 
         public override string ToString()
