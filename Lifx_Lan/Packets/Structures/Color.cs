@@ -17,25 +17,25 @@ namespace Lifx_Lan.Packets.Structures
         /// The section of the color spectrum that represents the color of your device. 
         /// So for example red is 0, green is 120, etc
         /// </summary>
-        public ushort Hue { get; set; } = 0;
+        public ushort Hue { get; } = 0;
 
         /// <summary>
         /// How strong the color is. 
         /// So a zero saturation is completely white, whilst full saturation is the full color
         /// </summary>
-        public ushort Saturation { get; set; } = 0;
+        public ushort Saturation { get; } = 0;
 
         /// <summary>
         /// How bright the color is. 
         /// So zero brightness is the same as the device is off, while full brightness be just that.
         /// </summary>
-        public ushort Brightness { get; set; } = 0;
+        public ushort Brightness { get; } = 0;
 
         /// <summary>
         /// The "temperature" when the device has zero saturation. 
         /// So a higher value is a cooler white (more blue) whereas a lower value is a warmer white (more yellow)
         /// </summary>
-        public ushort Kelvin { get; set; } = 0;
+        public ushort Kelvin { get; } = 0;
 
         public Color(ushort hue, ushort saturation, ushort brightness, ushort kelvin)
         {
