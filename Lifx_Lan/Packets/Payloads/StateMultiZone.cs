@@ -52,7 +52,7 @@ namespace Lifx_Lan.Packets.Payloads
 
             for (int i = 0; i < LEN_COLORS; i++)
             {
-                int offset = i * LEN_COLORS;
+                int offset = i * Color.SIZE;
                 ushort hue = BitConverter.ToUInt16(bytes, 2 + offset);
                 ushort saturation = BitConverter.ToUInt16(bytes, 4 + offset);
                 ushort brightness = BitConverter.ToUInt16(bytes, 6 + offset);

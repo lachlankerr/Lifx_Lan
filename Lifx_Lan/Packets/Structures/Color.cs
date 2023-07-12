@@ -14,6 +14,11 @@ namespace Lifx_Lan.Packets.Structures
     internal class Color
     {
         /// <summary>
+        /// The size of a <see cref="Color"/> struct in bytes
+        /// </summary>
+        public const int SIZE = 8;
+
+        /// <summary>
         /// The section of the color spectrum that represents the color of your device. 
         /// So for example red is 0, green is 120, etc
         /// </summary>
