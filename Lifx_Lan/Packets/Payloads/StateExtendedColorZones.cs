@@ -20,12 +20,12 @@ namespace Lifx_Lan.Packets.Payloads
         /// <summary>
         /// The initial number of bytes we need to determine how big this payload should be
         /// </summary>
-        const int INIT_SIZE = 5;
+        public const int INIT_SIZE = 5;
 
         /// <summary>
         /// The maximum length the Colors array can be
         /// </summary>
-        const int MAX_COLORS = 82;
+        public const int MAX_COLORS = 82;
 
         /// <summary>
         /// The number of zones on your strip
@@ -69,10 +69,12 @@ namespace Lifx_Lan.Packets.Payloads
             for (int i = 0; i < Colors_Count; i++)
             {
                 int offset = i * Color.SIZE;
+
                 ushort hue = BitConverter.ToUInt16(bytes, 5 + offset);
                 ushort saturation = BitConverter.ToUInt16(bytes, 7 + offset);
                 ushort brightness = BitConverter.ToUInt16(bytes, 9 + offset);
                 ushort kelvin = BitConverter.ToUInt16(bytes, 11 + offset);
+
                 Colors[i] = new Color(hue, saturation, brightness, kelvin);
             }
         }
