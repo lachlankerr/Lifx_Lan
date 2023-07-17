@@ -14,6 +14,7 @@ using Lifx_Lan.Packets.Payloads;
 using Lifx_Lan.Packets.Payloads.State;
 using Lifx_Lan.Packets.Payloads.State.Device;
 using Lifx_Lan.Packets.Payloads.State.Discovery;
+using Lifx_Lan.Packets.Payloads.State.MultiZone;
 using Lifx_Lan.Packets.Payloads.State.Tiles;
 
 namespace Lifx_Lan
@@ -94,7 +95,7 @@ namespace Lifx_Lan
                 Console.WriteLine(dev.Product.Label);
                 try
                 {
-                    Console.WriteLine(new SensorStateAmbientLight(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.SensorGetAmbientLight, new byte[] { })));
+                    Console.WriteLine(new StateMultiZone(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetColorZones, new byte[] { 0x00, 0xFF })));
                 }
                 catch (Exception ex)
                 {

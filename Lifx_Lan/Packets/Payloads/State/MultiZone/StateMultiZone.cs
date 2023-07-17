@@ -30,7 +30,7 @@ namespace Lifx_Lan.Packets.Payloads.State.MultiZone
         /// <summary>
         /// The zone this packet refers to.
         /// </summary>
-        public byte Zones_Index { get; } = 0;
+        public byte Zone_Index { get; } = 0;
 
         /// <summary>
         /// The HSBK values of the zones this packet refers to.
@@ -48,7 +48,7 @@ namespace Lifx_Lan.Packets.Payloads.State.MultiZone
                 throw new ArgumentException("Wrong number of bytes for this payload type, expected 66");
 
             Zones_Count = bytes[0];
-            Zones_Index = bytes[1];
+            Zone_Index = bytes[1];
 
             for (int i = 0; i < LEN_COLORS; i++)
             {
@@ -61,10 +61,24 @@ namespace Lifx_Lan.Packets.Payloads.State.MultiZone
             }
         }
 
+        /// <summary>
+        /// You can determine how many StateMultizone messages you will receive by looking at the request and the first reply.
+        /// </summary>
+        /// <returns></returns>
+        public int ExpectedNumberOfMessages(int start_index, int end_index)
+        {
+            int number_segments_of_8 = (end_index - start_index) / 8;
+            int count_from_request = Math.Max(1, number_segments_of_8 + 1);
+
+            int count_from_response = (int)Math.Ceiling(Zones_Count / 8d);
+
+            return Math.Min(count_from_request, count_from_response);
+        }
+
         public override string ToString()
         {
             return $@"Zones_Count: {Zones_Count}
-Zones_Index: {Zones_Index}
+Zone_Index: {Zone_Index}
 Colors: 
 {string.Join($"\n\n", Colors.ToList())}";
         }
@@ -77,14 +91,14 @@ Colors:
             {
                 StateMultiZone stateMultiZone = (StateMultiZone)obj;
                 return Zones_Count == stateMultiZone.Zones_Count &&
-                       Zones_Index == stateMultiZone.Zones_Index &&
+                       Zone_Index == stateMultiZone.Zone_Index &&
                        Colors.SequenceEqual(stateMultiZone.Colors);
             }
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Zones_Count, Zones_Index, Colors);
+            return HashCode.Combine(Zones_Count, Zone_Index, Colors);
         }
     }
 }
