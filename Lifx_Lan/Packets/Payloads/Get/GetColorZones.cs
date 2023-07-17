@@ -32,9 +32,9 @@ namespace Lifx_Lan.Packets.Payloads.Get
         public byte End_Index { get; } = 0;
 
         /// <summary>
-        /// Creates an instance of the <see cref="GetColorZones"/> class so we can see the values received from the packet
+        /// Creates an instance of the <see cref="GetColorZones"/> class so we can specify the payload values to send
         /// </summary>
-        /// <param name="bytes">The payload data from the received <see cref="GetColorZones"/> packet</param>
+        /// <param name="bytes">The payload data we will send with the <see cref="GetColorZones"/> packet</param>
         /// <exception cref="ArgumentException"></exception>
         public GetColorZones(byte[] bytes) : base(bytes) 
         {
@@ -43,6 +43,12 @@ namespace Lifx_Lan.Packets.Payloads.Get
 
             Start_Index = bytes[0];
             End_Index = bytes[1];
+        }
+
+        public GetColorZones(byte start_index, byte end_index) : base(new byte[] { start_index, end_index })
+        {
+            Start_Index = start_index;
+            End_Index = end_index;
         }
 
         public override string ToString()

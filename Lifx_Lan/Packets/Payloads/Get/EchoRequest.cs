@@ -21,9 +21,9 @@ namespace Lifx_Lan.Packets.Payloads.Get
         public byte[] Echoing { get; } = new byte[64];
 
         /// <summary>
-        /// Creates an instance of the <see cref="EchoRequest"/> class so we can see the values received from the packet
+        /// Creates an instance of the <see cref="EchoRequest"/> class so we can specify the payload values to send
         /// </summary>
-        /// <param name="bytes">The payload data from the received <see cref="EchoRequest"/> packet</param>
+        /// <param name="bytes">The payload data we will send with the <see cref="EchoRequest"/> packet</param>
         /// <exception cref="ArgumentException"></exception>
         public EchoRequest(byte[] bytes) : base(bytes)
         {
