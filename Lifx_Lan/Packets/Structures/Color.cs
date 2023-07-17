@@ -1,4 +1,4 @@
-﻿using Lifx_Lan.Packets.Payloads;
+﻿using Lifx_Lan.Packets.Payloads.State.Light;
 using System;
 using System.Collections.Generic;
 using System.Linq;

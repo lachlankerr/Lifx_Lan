@@ -11,6 +11,10 @@ using System.Threading;
 using Lifx_Lan.Packets;
 using Lifx_Lan.Packets.Enums;
 using Lifx_Lan.Packets.Payloads;
+using Lifx_Lan.Packets.Payloads.State;
+using Lifx_Lan.Packets.Payloads.State.Device;
+using Lifx_Lan.Packets.Payloads.State.Discovery;
+using Lifx_Lan.Packets.Payloads.State.Tiles;
 
 namespace Lifx_Lan
 {
@@ -82,7 +86,7 @@ namespace Lifx_Lan
             }
 
             SaveFoundDevicesToFileAsync(devices);*/
-            /*List<Device> devices = await ReadSavedDevicesFromFileAsync();
+            List<Device> devices = await ReadSavedDevicesFromFileAsync();
             Lan lan = new Lan();
             lan.StartReceivingPacketsAsync();
             foreach (Device dev in devices)
@@ -90,7 +94,7 @@ namespace Lifx_Lan
                 Console.WriteLine(dev.Product.Label);
                 try
                 {
-                    Console.WriteLine(new LightState(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetColor, new byte[] { })));
+                    Console.WriteLine(new SensorStateAmbientLight(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.SensorGetAmbientLight, new byte[] { })));
                 }
                 catch (Exception ex)
                 {
@@ -103,7 +107,7 @@ namespace Lifx_Lan
             Console.ReadLine(); 
 
             lan.StopReceivingPackets();
-            await Task.Delay(ONE_SECOND);*/
+            await Task.Delay(ONE_SECOND);
 
             //Decoder.PrintFields(pkt.ToBytes());
             //Decoder.PrintFields(lan.ReceivedPackets[0].Packet.ToBytes());
@@ -118,7 +122,7 @@ namespace Lifx_Lan
             }*/
             //devices.ForEach(Console.WriteLine);*/
 
-            int i = 0;
+            /*int i = 0;
             //Console.WriteLine(i);
             //Console.WriteLine(i += 2);
             //Console.WriteLine(i);
@@ -162,7 +166,7 @@ namespace Lifx_Lan
             StateTileEffect effect2 = new StateTileEffect(byteArray, true);
             //Console.WriteLine(effect1.Equals(effect2));
             Console.WriteLine(effect1.Size);
-            Console.WriteLine(effect2.Size);
+            Console.WriteLine(effect2.Size);*/
 
             //Console.WriteLine(effect.Parameters.Size());
 
