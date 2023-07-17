@@ -44,31 +44,31 @@ namespace Lifx_Lan
 
             //primitives
             else if (t == typeof(sbyte))
-                return sizeof(sbyte);
+                return sizeof(sbyte);       //1
             else if (t == typeof(byte))
-                return sizeof(byte);
+                return sizeof(byte);        //1
             else if (t == typeof(short))
-                return sizeof(short);
+                return sizeof(short);       //2
             else if (t == typeof(ushort))
-                return sizeof(ushort);
+                return sizeof(ushort);      //2
             else if (t == typeof(int))
-                return sizeof(int);
+                return sizeof(int);         //4
             else if (t == typeof(uint))
-                return sizeof(uint);
+                return sizeof(uint);        //4
             else if (t == typeof(long))
-                return sizeof(long);
+                return sizeof(long);        //8
             else if (t == typeof(ulong))
-                return sizeof(ulong);
+                return sizeof(ulong);       //8
             else if (t == typeof(char))
-                return sizeof(char);
+                return sizeof(char);        //2
             else if (t == typeof(float))
-                return sizeof(float);
+                return sizeof(float);       //4
             else if (t == typeof(double))
-                return sizeof(double);
+                return sizeof(double);      //8
             else if (t == typeof(decimal))
-                return sizeof(decimal);
+                return sizeof(decimal);     //16
             else if (t == typeof(bool))
-                return sizeof(bool);
+                return sizeof(bool);        //1
 
             //structs
             else if (t == typeof(Color))
