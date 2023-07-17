@@ -11,10 +11,12 @@ using System.Threading;
 using Lifx_Lan.Packets;
 using Lifx_Lan.Packets.Enums;
 using Lifx_Lan.Packets.Payloads;
+using Lifx_Lan.Packets.Payloads.Get;
 using Lifx_Lan.Packets.Payloads.State;
 using Lifx_Lan.Packets.Payloads.State.Device;
 using Lifx_Lan.Packets.Payloads.State.Discovery;
 using Lifx_Lan.Packets.Payloads.State.MultiZone;
+using Lifx_Lan.Packets.Payloads.State.Relay;
 using Lifx_Lan.Packets.Payloads.State.Tiles;
 
 namespace Lifx_Lan
@@ -95,7 +97,13 @@ namespace Lifx_Lan
                 Console.WriteLine(dev.Product.Label);
                 try
                 {
-                    Console.WriteLine(new StateMultiZone(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetColorZones, new byte[] { 0x00, 0xFF })));
+                    if (dev.Product.Features.relays)
+                    {
+                        byte[] bytes = new GetRPower(0).Bytes;
+                        Console.WriteLine(new StateRPower(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetRPower, bytes)));
+                    }
+                    else
+                        Console.WriteLine("Not supported");
                 }
                 catch (Exception ex)
                 {

@@ -44,7 +44,7 @@ namespace Lifx_Lan.Packets.Payloads.State.Relay
         public override string ToString()
         {
             return $@"Relay_Index: {Relay_Index}
-Level: {Level}";
+Level: {(Level == 0 ? "Off" : "On")} ({Level})";
         }
 
         public override bool Equals(object? obj)
