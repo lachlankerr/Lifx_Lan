@@ -73,5 +73,10 @@ End_Index: {End_Index}";
         {
             return HashCode.Combine(Start_Index, End_Index);
         }
+
+        public static FeaturesFlags NeededCapabilities()
+        {
+            return FeaturesFlags.Multizone;
+        }
     }
 }

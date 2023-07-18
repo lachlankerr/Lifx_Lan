@@ -43,6 +43,17 @@ namespace Lifx_Lan
             //FillCapabilitiesJsonDocument();
         }
 
+        /// <summary>
+        /// Whether this product has the needed capabilities to send a particular message type
+        /// </summary>
+        /// <param name="needed">The needed capabilities</param>
+        /// <returns></returns>
+        public bool HasCapabilities(FeaturesFlags needed)
+        {
+            FeaturesFlags capabilities = Features.AsFlag();
+            return !capabilities.Equals(FeaturesFlags.None) && capabilities.HasFlag(needed);
+        }
+
         public void FillCapabilitiesJsonNode()
         {
             JsonArray emptyArray = new JsonArray();
@@ -79,7 +90,7 @@ namespace Lifx_Lan
                                     Features.buttons = newFeatures?["buttons"]?.GetValue<bool>() ?? Features.buttons;
                                     Features.infrared = newFeatures?["infrared"]?.GetValue<bool>() ?? Features.infrared;
                                     Features.multizone = newFeatures?["multizone"]?.GetValue<bool>() ?? Features.multizone;
-                                    Features.temperature_range = newFeatures?["temperature_range"]?.AsArray().Select(x => x.GetValue<int>()).ToArray() ?? Features.temperature_range;
+                                    Features.temperature_range = newFeatures?["temperature_range"]?.AsArray().Select(x => x!.GetValue<int>()).ToArray() ?? Features.temperature_range;
                                     Features.extended_multizone = newFeatures?["extended_multizone"]?.GetValue<bool>() ?? Features.extended_multizone;
                                 }
                             }
@@ -151,8 +162,7 @@ namespace Lifx_Lan
 Vendor: {Vendor_Name} ({Vendor_ID})
 Name: {Product_Name} ({Product_ID})
 Firmware: ({Firmware_Major}, {Firmware_Minor})
-Features: [{Features}
-]";
+Features: {Features}";
         }
 
         public override bool Equals(object? obj)

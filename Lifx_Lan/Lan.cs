@@ -95,9 +95,10 @@ namespace Lifx_Lan
             foreach (Device dev in devices)
             {
                 Console.WriteLine(dev.Product.Label);
+                Console.WriteLine(dev.Product.Features.AsFlag());
                 try
                 {
-                    if (dev.Product.Features.relays)
+                    if (dev.Product.HasCapabilities(GetRPower.NeededCapabilities()))
                     {
                         byte[] bytes = new GetRPower(0).Bytes;
                         Console.WriteLine(new StateRPower(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetRPower, bytes)));

@@ -59,5 +59,10 @@ namespace Lifx_Lan.Packets.Payloads.Get
         {
             return HashCode.Combine(Relay_Index);
         }
+
+        public static FeaturesFlags NeededCapabilities()
+        {
+            return FeaturesFlags.Relays;
+        }
     }
 }

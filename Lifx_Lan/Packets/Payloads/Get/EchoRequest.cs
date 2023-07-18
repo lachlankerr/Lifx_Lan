@@ -53,5 +53,10 @@ namespace Lifx_Lan.Packets.Payloads.Get
         {
             return HashCode.Combine(Echoing);
         }
+
+        public static FeaturesFlags NeededCapabilities()
+        {
+            return FeaturesFlags.None;
+        }
     }
 }

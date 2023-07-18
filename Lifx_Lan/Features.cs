@@ -62,17 +62,7 @@ namespace Lifx_Lan
 
         public override string ToString()
         {
-            return $@"
-    HEV: {hev}
-    Color: {color}
-    Chain: {chain}
-    Matrix: {matrix}
-    Relays: {relays}
-    Buttons: {buttons}
-    Infrared: {infrared}
-    Multizone: {multizone}
-    Temperature Range: {temperature_range[0]} - {temperature_range[1]}
-    Extended Multizone: {extended_multizone}";
+            return $@"Features: {AsFlag()} ({(ushort)AsFlag()})";
         }
 
         public override bool Equals(object? obj)
@@ -82,16 +72,16 @@ namespace Lifx_Lan
             else
             {
                 Features features = (Features)obj;
-                return this.hev == features.hev &&
-                       this.color == features.color &&
-                       this.chain == features.chain &&
-                       this.matrix == features.matrix &&
-                       this.relays == features.relays &&
-                       this.buttons == features.buttons &&
-                       this.infrared == features.infrared &&
-                       this.multizone == features.multizone &&
-                       this.temperature_range.SequenceEqual(features.temperature_range) && 
-                       this.extended_multizone == features.extended_multizone;
+                return hev                          == features.hev &&
+                       color                        == features.color &&
+                       chain                        == features.chain &&
+                       matrix                       == features.matrix &&
+                       relays                       == features.relays &&
+                       buttons                      == features.buttons &&
+                       infrared                     == features.infrared &&
+                       multizone                    == features.multizone &&
+                       temperature_range.SequenceEqual(features.temperature_range) && 
+                       extended_multizone           == features.extended_multizone;
             }
         }
 
@@ -110,5 +100,80 @@ namespace Lifx_Lan
             hash.Add(extended_multizone);
             return hash.ToHashCode();
         }
+
+        public FeaturesFlags AsFlag()
+        {
+            return (hev                         ? FeaturesFlags.Hev                 : FeaturesFlags.None) |
+                   (color                       ? FeaturesFlags.Color               : FeaturesFlags.None) |
+                   (chain                       ? FeaturesFlags.Chain               : FeaturesFlags.None) |
+                   (matrix                      ? FeaturesFlags.Matrix              : FeaturesFlags.None) |
+                   (relays                      ? FeaturesFlags.Relays              : FeaturesFlags.None) |
+                   (buttons                     ? FeaturesFlags.Buttons             : FeaturesFlags.None) |
+                   (infrared                    ? FeaturesFlags.Infrared            : FeaturesFlags.None) |
+                   (multizone                   ? FeaturesFlags.Multizone           : FeaturesFlags.None) |
+                   (temperature_range[0] != 0   ? FeaturesFlags.TemperatureRange    : FeaturesFlags.None) | //lowest is currently 1500
+                   (extended_multizone          ? FeaturesFlags.ExtendedMultizone   : FeaturesFlags.None);
+        }
+    }
+
+    [Flags]
+    public enum FeaturesFlags : ushort
+    {
+        /// <summary>
+        /// The product has not features available
+        /// </summary>
+        None                = 0b00000000_00000000, // 0,
+
+        /// <summary>
+        /// The light supports emitting HEV light
+        /// </summary>
+        Hev                 = 0b00000000_00000001, // 1 << 0,
+
+        /// <summary>
+        /// The light changes physical appearance when the Hue value is changed
+        /// </summary>
+        Color               = 0b00000000_00000010, // 1 << 1,
+
+        /// <summary>
+        /// The light may be connected to physically separated hardware (currently only the LIFX Tile)
+        /// </summary>
+        Chain               = 0b00000000_00000100, // 1 << 2,
+
+        /// <summary>
+        /// The light supports a 2D matrix of LEDs (the Tile and Candle)
+        /// </summary>
+        Matrix              = 0b00000000_00001000, // 1 << 3,
+
+        /// <summary>
+        /// The device has relays for controlling physical power to something (the LIFX Switch)
+        /// </summary>
+        Relays              = 0b00000000_00010000, // 1 << 4,
+
+        /// <summary>
+        /// The device has physical buttons to press (the LIFX Switch)
+        /// </summary>
+        Buttons             = 0b00000000_00100000, // 1 << 5,
+
+        /// <summary>
+        /// The light supports emitting infrared light
+        /// </summary>
+        Infrared            = 0b00000000_01000000, // 1 << 6,
+
+        /// <summary>
+        /// The light supports a 1D linear array of LEDs (the Z and Beam)
+        /// </summary>
+        Multizone           = 0b00000000_10000000, // 1 << 7,
+
+        /// <summary>
+        /// An array of the minimum and maximum kelvin values this device supports. 
+        /// If the numbers are the same then the device does not support variable kelvin values. 
+        /// It is null for devices that aren't lighting products (the LIFX Switch)
+        /// </summary>
+        TemperatureRange    = 0b00000001_00000000, // 1 << 8,
+
+        /// <summary>
+        /// The more capable extended API for multizone control that lets us control all the zones on the device with a single message instead of many.
+        /// </summary>
+        ExtendedMultizone   = 0b00000010_00000000, // 1 << 9,
     }
 }
