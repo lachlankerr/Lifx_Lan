@@ -1,4 +1,5 @@
-﻿using Lifx_Lan.Packets.Payloads.Get;
+﻿using Lifx_Lan.Packets.Enums;
+using Lifx_Lan.Packets.Payloads.Get;
 using Lifx_Lan.Packets.Payloads.State.Device;
 using Lifx_Lan.Packets.Payloads.State.Relay;
 using System;

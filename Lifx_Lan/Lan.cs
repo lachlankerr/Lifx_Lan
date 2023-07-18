@@ -96,7 +96,7 @@ namespace Lifx_Lan
             foreach (Device dev in devices)
             {
                 Console.WriteLine(dev.Product.Label);
-                Console.WriteLine(dev.Product.Features.AsFlag());
+                //Console.WriteLine(dev.Product.Features.AsFlag());
                 try
                 {
                     Pkt_Type type = Pkt_Type.GetRPower;
