@@ -89,6 +89,7 @@ namespace Lifx_Lan
             }
 
             SaveFoundDevicesToFileAsync(devices);*/
+            Console.WriteLine(Pkt_Type.EchoRequest.MappedType());
             List<Device> devices = await ReadSavedDevicesFromFileAsync();
             Lan lan = new Lan();
             lan.StartReceivingPacketsAsync();
@@ -98,10 +99,12 @@ namespace Lifx_Lan
                 Console.WriteLine(dev.Product.Features.AsFlag());
                 try
                 {
+                    Pkt_Type type = Pkt_Type.GetRPower;
+                    //if (dev.Product.HasCapabilities((FeaturesFlags)type.MappedType().GetMethod("NeededCapabilities")!.Invoke(null, null)!))
                     if (dev.Product.HasCapabilities(GetRPower.NeededCapabilities()))
                     {
                         byte[] bytes = new GetRPower(0).Bytes;
-                        Console.WriteLine(new StateRPower(await lan.SendToDeviceThenReceiveAsync(dev, Pkt_Type.GetRPower, bytes)));
+                        Console.WriteLine(new StateRPower(await lan.SendToDeviceThenReceiveAsync(dev, type, bytes)));
                     }
                     else
                         Console.WriteLine("Not supported");

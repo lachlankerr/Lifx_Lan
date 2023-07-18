@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Lifx_Lan.Packets.Payloads.State.Device;
+using Lifx_Lan.Packets.Payloads.State.Relay;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -63,6 +65,11 @@ namespace Lifx_Lan.Packets.Payloads.Get
         public static FeaturesFlags NeededCapabilities()
         {
             return FeaturesFlags.Relays;
+        }
+
+        public static Type[] ReturnMessages()
+        {
+            return new Type[] { typeof(StateRPower) };
         }
     }
 }

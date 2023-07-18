@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Lifx_Lan.Packets.Payloads.State.Device;
+using Lifx_Lan.Packets.Payloads.State.Tiles;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -58,6 +60,11 @@ Reserved7: {Reserved7}";
         public static FeaturesFlags NeededCapabilities()
         {
             return FeaturesFlags.None;
+        }
+
+        public static Type[] ReturnMessages()
+        {
+            return new Type[] { typeof(StateTileEffect) };
         }
     }
 }

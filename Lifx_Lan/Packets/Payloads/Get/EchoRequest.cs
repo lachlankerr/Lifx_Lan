@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lifx_Lan.Packets.Payloads.State.Device;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
@@ -57,6 +58,11 @@ namespace Lifx_Lan.Packets.Payloads.Get
         public static FeaturesFlags NeededCapabilities()
         {
             return FeaturesFlags.None;
+        }
+
+        public static Type[] ReturnMessages()
+        {
+            return new Type[] { typeof(EchoResponse) };
         }
     }
 }

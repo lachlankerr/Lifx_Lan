@@ -13,15 +13,6 @@ namespace Lifx_Lan.Packets.Enums
         ////////////////
 
         //Discovery
-        /// <summary>
-        /// This packet is used for Discovery of devices. 
-        /// Typically you would broadcast this message to the network (with tagged field in the header set to 0 and the target field in the header set to all zeros)
-        /// 
-        /// Each device on the network that receives this packet will send back multiple StateService (3) messages that say what services are available and the port those services are on.
-        /// 
-        /// The only StateService (3) message you care about will tell you that UDP is available on a port that is usually 56700. 
-        /// You can determine the IP address of the device from information your UDP socket should receive when it gets those bytes.
-        /// </summary>
         GetService = 2,
 
         //Device
@@ -64,11 +55,6 @@ namespace Lifx_Lan.Packets.Enums
         ////////////////
 
         //Device
-        /// <summary>
-        /// This packet lets you set the current level of power on the device.
-        /// </summary>
-        /// <param name="level">Uint16 : If you specify 0 the light will turn off and if you specify 65535 the device will turn on.</param>
-        /// <returns>StatePower (22) message</returns>
         SetPower = 21,
         SetLabel = 24,
         SetReboot = 38,
@@ -103,9 +89,6 @@ namespace Lifx_Lan.Packets.Enums
         //////////////////
 
         //Core
-        /// <summary>
-        /// This packet is returned when you specify ack_required=1.
-        /// </summary>
         Acknowledgement = 45,
 
         //Discovery

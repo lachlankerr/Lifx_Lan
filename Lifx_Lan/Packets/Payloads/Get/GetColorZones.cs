@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Lifx_Lan.Packets.Payloads.State.Device;
+using Lifx_Lan.Packets.Payloads.State.MultiZone;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -77,6 +79,11 @@ End_Index: {End_Index}";
         public static FeaturesFlags NeededCapabilities()
         {
             return FeaturesFlags.Multizone;
+        }
+
+        public static Type[] ReturnMessages()
+        {
+            return new Type[] { typeof(StateZone), typeof(StateMultiZone) };
         }
     }
 }

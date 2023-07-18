@@ -12,5 +12,7 @@ namespace Lifx_Lan.Packets.Payloads
     internal interface ISendable
     {
         static abstract FeaturesFlags NeededCapabilities();
+
+        static abstract Type[] ReturnMessages();
     }
 }
