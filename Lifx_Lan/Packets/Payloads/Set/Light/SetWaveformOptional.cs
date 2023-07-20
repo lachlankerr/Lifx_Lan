@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Lifx_Lan.Packets.Payloads.Set.Light
 {
-    internal class SetWaveform : Payload, ISendable
+    internal class SetWaveformOptional : Payload, ISendable
     {
         public byte Reserved6 { get; } = 0;
 
@@ -59,10 +59,35 @@ namespace Lifx_Lan.Packets.Payloads.Set.Light
         /// </summary>
         public Waveform Waveform { get; } = Waveform.SAW;
 
-        public SetWaveform(byte[] bytes) : base(bytes) 
+        /// <summary>
+        /// Use the hue value in this message
+        /// </summary>
+        public byte Set_Hue { get; } = 0;
+
+        /// <summary>
+        /// Use the saturation value in this message
+        /// </summary>
+        public byte Set_Saturation { get; } = 0;
+
+        /// <summary>
+        /// Use the brightness value in this message
+        /// </summary>
+        public byte Set_Brightness { get; } = 0;
+
+        /// <summary>
+        /// Use the kelvin value in this message
+        /// </summary>
+        public byte Set_Kelvin { get; } = 0;
+
+        /// <summary>
+        /// Creates an instance of the <see cref="SetWaveformOptional"/> class so we can specify the payload values to send
+        /// </summary>
+        /// <param name="bytes">The payload data we will send with the <see cref="SetWaveformOptional"/> packet</param>
+        /// <exception cref="ArgumentException"></exception>
+        public SetWaveformOptional(byte[] bytes) : base(bytes)
         {
-            if (bytes.Length != 21)
-                throw new ArgumentException("Wrong number of bytes for this payload type, expected 21");
+            if (bytes.Length != 25)
+                throw new ArgumentException("Wrong number of bytes for this payload type, expected 25");
 
             Reserved6 = bytes[0];                               //1
             Transient = bytes[1];                               //1
@@ -74,9 +99,15 @@ namespace Lifx_Lan.Packets.Payloads.Set.Light
             Cycles = BitConverter.ToSingle(bytes, 14);          //4
             Skew_Ratio = BitConverter.ToInt16(bytes, 18);       //2
             Waveform = (Waveform)bytes[20];                     //1
+            Set_Hue = bytes[21];                                //1
+            Set_Saturation = bytes[22];                         //1
+            Set_Brightness = bytes[23];                         //1
+            Set_Kelvin = bytes[24];                             //1
         }
 
-        public SetWaveform(byte reserved6, byte transient, ushort hue, ushort saturation, ushort brightness, ushort kelvin, uint period, float cycles, short skew_ratio, Waveform waveform)
+        public SetWaveformOptional(byte reserved6, byte transient, ushort hue, ushort saturation, ushort brightness, 
+            ushort kelvin, uint period, float cycles, short skew_ratio, Waveform waveform, 
+            byte set_hue, byte set_saturation, byte set_brightness, byte set_kelvin)
             : base(
                   new byte[] { reserved6, transient }
                   .Concat(BitConverter.GetBytes(hue))
@@ -86,7 +117,7 @@ namespace Lifx_Lan.Packets.Payloads.Set.Light
                   .Concat(BitConverter.GetBytes(period))
                   .Concat(BitConverter.GetBytes(cycles))
                   .Concat(BitConverter.GetBytes(skew_ratio))
-                  .Concat(new byte[] { (byte)waveform })
+                  .Concat(new byte[] { (byte)waveform, set_hue, set_saturation, set_brightness, set_kelvin })
                   .ToArray()
               )
         {
@@ -100,12 +131,16 @@ namespace Lifx_Lan.Packets.Payloads.Set.Light
             Cycles = cycles;
             Skew_Ratio = skew_ratio;
             Waveform = waveform;
+            Set_Hue = set_hue;
+            Set_Saturation = set_saturation;
+            Set_Brightness = set_brightness;
+            Set_Kelvin = set_kelvin;
         }
 
         public override string ToString()
         {
             return $@"Reserved6: {Reserved6}
-Transient: {Transient}
+Transient: {Transient != 0}
 Hue: {LightState.UInt16ToHue(Hue)} ({Hue})
 Saturation: {LightState.UInt16ToPercentage(Saturation) * 100.0f}% ({Saturation})
 Brightness: {LightState.UInt16ToPercentage(Brightness) * 100.0f}% ({Brightness})
@@ -113,7 +148,11 @@ Kelvin: {Kelvin}
 Period: {Period}
 Cycles: {Cycles}
 Skew_Ratio: {Skew_Ratio}
-Waveform: {Waveform}";
+Waveform: {Waveform}
+Set_Hue: {Set_Hue != 0}
+Set_Saturation: {Set_Saturation != 0}
+Set_Brightness: {Set_Brightness != 0}
+Set_Kelvin: {Set_Kelvin != 0}";
         }
 
         public override bool Equals(object? obj)
@@ -122,17 +161,21 @@ Waveform: {Waveform}";
                 return false;
             else
             {
-                SetWaveform setWaveform = (SetWaveform)obj;
-                return Reserved6 == setWaveform.Reserved6 &&
-                       Transient == setWaveform.Transient &&
-                       Hue == setWaveform.Hue &&
-                       Saturation == setWaveform.Saturation &&
-                       Brightness == setWaveform.Brightness &&
-                       Kelvin == setWaveform.Kelvin &&
-                       Period == setWaveform.Period &&
-                       Cycles == setWaveform.Cycles &&
-                       Skew_Ratio == setWaveform.Skew_Ratio &&
-                       Waveform == setWaveform.Waveform;
+                SetWaveformOptional setWaveformOptional = (SetWaveformOptional)obj;
+                return Reserved6 == setWaveformOptional.Reserved6 &&
+                       Transient == setWaveformOptional.Transient &&
+                       Hue == setWaveformOptional.Hue &&
+                       Saturation == setWaveformOptional.Saturation &&
+                       Brightness == setWaveformOptional.Brightness &&
+                       Kelvin == setWaveformOptional.Kelvin &&
+                       Period == setWaveformOptional.Period &&
+                       Cycles == setWaveformOptional.Cycles &&
+                       Skew_Ratio == setWaveformOptional.Skew_Ratio &&
+                       Waveform == setWaveformOptional.Waveform &&
+                       Set_Hue == setWaveformOptional.Set_Hue &&
+                       Set_Saturation == setWaveformOptional.Set_Saturation &&
+                       Set_Brightness == setWaveformOptional.Set_Brightness &&
+                       Set_Kelvin == setWaveformOptional.Set_Kelvin;
             }
         }
 
@@ -149,6 +192,10 @@ Waveform: {Waveform}";
             hash.Add(Cycles);
             hash.Add(Skew_Ratio);
             hash.Add(Waveform);
+            hash.Add(Set_Hue);
+            hash.Add(Set_Saturation);
+            hash.Add(Set_Brightness);
+            hash.Add(Set_Kelvin);
             return hash.ToHashCode();
         }
 
