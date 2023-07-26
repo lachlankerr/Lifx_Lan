@@ -89,6 +89,29 @@ namespace Lifx_Lan
             }
 
             SaveFoundDevicesToFileAsync(devices);*/
+
+            BoolInt boolInt1 = false;
+            BoolInt boolInt2 = true;
+            BoolInt boolInt3 = 0;
+            BoolInt boolInt4 = 1;
+            BoolInt boolInt5 = 2;
+            Console.WriteLine(boolInt1); //False
+            Console.WriteLine(boolInt2); //True
+            Console.WriteLine(boolInt3); //False
+            Console.WriteLine(boolInt4); //True
+            Console.WriteLine(boolInt5); //True
+            Console.WriteLine((byte)boolInt1); //0
+            Console.WriteLine((byte)boolInt2); //1
+            Console.WriteLine((byte)boolInt3); //0
+            Console.WriteLine((byte)boolInt4); //1
+            Console.WriteLine((byte)boolInt5); //1
+            Console.WriteLine(boolInt3 == boolInt4); //False
+            Console.WriteLine(boolInt4 == boolInt5); //True
+            Console.WriteLine(BitConverter.ToString(BitConverter.GetBytes(boolInt1))); //0x00
+            Console.WriteLine(BitConverter.ToString(BitConverter.GetBytes(boolInt2))); //0x01
+
+            Console.ReadLine();
+
             Console.WriteLine(Pkt_Type.EchoRequest.MappedType());
             List<Device> devices = await ReadSavedDevicesFromFileAsync();
             Lan lan = new Lan();
