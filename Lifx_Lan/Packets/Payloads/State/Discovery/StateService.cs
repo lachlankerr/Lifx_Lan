@@ -40,6 +40,11 @@ namespace Lifx_Lan.Packets.Payloads.State.Discovery
         }
 
         public StateService(Services service = 0, uint port = 0)
+            : base(
+                  new byte[] { (byte)service }
+                  .Concat(BitConverter.GetBytes(port))
+                  .ToArray()
+                  )
         {
             Service = service;
             Port = port;

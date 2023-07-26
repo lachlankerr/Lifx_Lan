@@ -16,9 +16,9 @@ namespace Lifx_Lan.Packets.Payloads
         /// <summary>
         /// The payload data as a byte array.
         /// </summary>
-        public byte[] Bytes { get; } = new byte[0];
+        public byte[] Bytes { get; } = Array.Empty<byte>();
 
-        public Payload()
+        private Payload()
         {
 
         }

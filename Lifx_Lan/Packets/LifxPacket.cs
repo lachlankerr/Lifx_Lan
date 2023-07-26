@@ -41,7 +41,7 @@ namespace Lifx_Lan.Packets
             FrameHeader = new FrameHeader(FrameHeader.MIN_SIZE, tagged, source);
             FrameAddress = new FrameAddress(res_required, ack_required, sequence);
             ProtocolHeader = new ProtocolHeader(pkt_type);
-            Payload = new Payload();
+            Payload = new Payload(Array.Empty<byte>());
         }
 
         public LifxPacket(byte[] target, Pkt_Type pkt_type, bool tagged = false,
@@ -51,7 +51,7 @@ namespace Lifx_Lan.Packets
             FrameHeader = new FrameHeader(FrameHeader.MIN_SIZE, tagged, source);
             FrameAddress = new FrameAddress(target, res_required, ack_required, sequence);
             ProtocolHeader = new ProtocolHeader(pkt_type);
-            Payload = new Payload();
+            Payload = new Payload(Array.Empty<byte>());
         }
 
         public LifxPacket(byte[] target, Pkt_Type pkt_type, byte[] payload, bool tagged = false,
