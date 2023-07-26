@@ -21,7 +21,7 @@ namespace Lifx_Lan.Packets.Payloads.State.MultiZone
         /// <summary>
         /// The unique value identifying this effect
         /// </summary>
-        public uint Instance_Id { get; } = 0;
+        public uint InstanceId { get; } = 0;
 
         public MultiZoneEffectType Type { get; } = 0;
 
@@ -56,7 +56,7 @@ namespace Lifx_Lan.Packets.Payloads.State.MultiZone
             if (bytes.Length != 59)
                 throw new ArgumentException("Wrong number of bytes for this payload type, expected 59");
 
-            Instance_Id = BitConverter.ToUInt32(bytes, 0);  //4
+            InstanceId = BitConverter.ToUInt32(bytes, 0);   //4
             Type = (MultiZoneEffectType)bytes[4];           //1
             Reserved6 = bytes.Skip(5).Take(2).ToArray();    //2
             Speed = BitConverter.ToUInt32(bytes, 7);        //4
@@ -68,7 +68,7 @@ namespace Lifx_Lan.Packets.Payloads.State.MultiZone
 
         public override string ToString()
         {
-            return $@"Instance_Id: {Instance_Id}
+            return $@"InstanceId: {InstanceId}
 Type: {Type} ({(byte)Type})
 Reserved6: {BitConverter.ToString(Reserved6)}
 Speed: {Speed}
@@ -85,7 +85,7 @@ Parameters: {BitConverter.ToString(Parameters)}";
             else
             {
                 StateMultiZoneEffect stateMultiZoneEffect = (StateMultiZoneEffect)obj;
-                return Instance_Id == stateMultiZoneEffect.Instance_Id &&
+                return InstanceId == stateMultiZoneEffect.InstanceId &&
                        Type == stateMultiZoneEffect.Type &&
                        Reserved6.SequenceEqual(stateMultiZoneEffect.Reserved6) &&
                        Speed == stateMultiZoneEffect.Speed &&
@@ -97,7 +97,7 @@ Parameters: {BitConverter.ToString(Parameters)}";
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Instance_Id, Type, Reserved6, Speed, Duration, Reserved7, Reserved8, Parameters);
+            return HashCode.Combine(InstanceId, Type, Reserved6, Speed, Duration, Reserved7, Reserved8, Parameters);
         }
     }
 }

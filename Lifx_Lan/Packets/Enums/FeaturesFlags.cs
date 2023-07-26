@@ -10,7 +10,7 @@ namespace Lifx_Lan.Packets.Enums
     public enum FeaturesFlags : ushort
     {
         /// <summary>
-        /// The product has not features available
+        /// The product has no features available
         /// </summary>
         None = 0b00000000_00000000, // 0,
 
@@ -50,6 +50,7 @@ namespace Lifx_Lan.Packets.Enums
         Infrared = 0b00000000_01000000, // 1 << 6,
 
         /// <summary>
+        /// "Linear Zones"
         /// The light supports a 1D linear array of LEDs (the Z and Beam)
         /// </summary>
         Multizone = 0b00000000_10000000, // 1 << 7,
@@ -62,6 +63,7 @@ namespace Lifx_Lan.Packets.Enums
         TemperatureRange = 0b00000001_00000000, // 1 << 8,
 
         /// <summary>
+        /// "Extended Linear Zones"
         /// The more capable extended API for multizone control that lets us control all the zones on the device with a single message instead of many.
         /// </summary>
         ExtendedMultizone = 0b00000010_00000000, // 1 << 9,
