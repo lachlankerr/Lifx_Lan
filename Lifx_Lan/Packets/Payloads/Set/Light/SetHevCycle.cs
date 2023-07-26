@@ -44,6 +44,17 @@ namespace Lifx_Lan.Packets.Payloads.Set.Light
             Duration_S = BitConverter.ToUInt32(bytes, 1);
         }
 
+        public SetHevCycle(BoolInt enable, uint duration_s)
+            : base(
+                  new byte[] { (byte)enable }
+                  .Concat(BitConverter.GetBytes(duration_s))
+                  .ToArray()
+              )
+        {
+            Enable = enable;
+            Duration_S = duration_s;
+        }
+
         public override string ToString()
         {
             return $@"Enable: {Enable}

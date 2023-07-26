@@ -37,6 +37,14 @@ namespace Lifx_Lan.Packets.Payloads.Set.Light
             Brightness = BitConverter.ToUInt16(bytes, 0);
         }
 
+        public SetInfrared(ushort brightness)
+            : base(
+                  BitConverter.GetBytes(brightness)
+              )
+        {
+            Brightness = brightness;
+        }
+
         public override string ToString()
         {
             return $@"Brightness: {Brightness}";
