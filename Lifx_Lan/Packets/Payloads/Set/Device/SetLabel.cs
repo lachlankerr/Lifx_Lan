@@ -32,6 +32,14 @@ namespace Lifx_Lan.Packets.Payloads.Set.Device
             Label = Encoding.ASCII.GetString(bytes);
         }
 
+        public SetLabel(string label) 
+            : base( 
+                  Encoding.ASCII.GetBytes(label)
+              )
+        {
+            Label = label;
+        }
+
         public override string ToString()
         {
             return $@"Lable: {Label}";

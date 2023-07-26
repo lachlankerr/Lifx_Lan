@@ -46,6 +46,19 @@ namespace Lifx_Lan.Packets.Payloads.Set.Device
             Updated_At = BitConverter.ToUInt64(bytes, 48);
         }
 
+        public SetGroup(byte[] group, string label, ulong updated_at)
+            : base(
+                  group
+                  .Concat(Encoding.ASCII.GetBytes(label))
+                  .Concat(BitConverter.GetBytes(updated_at))
+                  .ToArray()
+              )
+        {
+            Group = group;
+            Label = label;
+            Updated_At = updated_at;
+        }
+
         public override string ToString()
         {
             return $@"Group: {BitConverter.ToString(Group)}

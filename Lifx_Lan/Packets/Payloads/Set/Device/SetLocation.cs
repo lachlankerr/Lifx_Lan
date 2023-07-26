@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Lifx_Lan.Packets.Payloads.Set.Device
@@ -44,6 +45,19 @@ namespace Lifx_Lan.Packets.Payloads.Set.Device
             Location = bytes.Take(16).ToArray();
             Label = Encoding.ASCII.GetString(bytes, 16, 32);
             Updated_At = BitConverter.ToUInt64(bytes, 48);
+        }
+
+        public SetLocation(byte[] location, string label, ulong updated_at)
+            : base(
+                  location
+                  .Concat(Encoding.ASCII.GetBytes(label))
+                  .Concat(BitConverter.GetBytes(updated_at))
+                  .ToArray()
+              )
+        {
+            Location = location;
+            Label = label;
+            Updated_At = updated_at;
         }
 
         public override string ToString()

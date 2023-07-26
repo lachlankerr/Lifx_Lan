@@ -35,7 +35,10 @@ namespace Lifx_Lan.Packets.Payloads.Set.Device
             Level = BitConverter.ToUInt16(bytes, 0);
         }
 
-        public SetPower(ushort level) : base(BitConverter.GetBytes(level))
+        public SetPower(ushort level) 
+            : base(
+                  BitConverter.GetBytes(level)
+              )
         {
             Level = level;
         }
