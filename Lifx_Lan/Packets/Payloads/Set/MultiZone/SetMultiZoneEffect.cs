@@ -25,7 +25,7 @@ namespace Lifx_Lan.Packets.Payloads.Set.MultiZone
 
         public MultiZoneEffectType Type { get; } = 0;
 
-        public byte[] Reserved6 { get; } = new byte[2];
+        public Reserved Reserved6 { get; } = 2;
 
         /// <summary>
         /// The time it takes for one cycle of the effect in milliseconds
@@ -37,9 +37,9 @@ namespace Lifx_Lan.Packets.Payloads.Set.MultiZone
         /// </summary>
         public ulong Duration { get; } = 0;
 
-        public byte[] Reserved7 { get; } = new byte[4];
+        public Reserved Reserved7 { get; } = 4;
 
-        public byte[] Reserved8 { get; } = new byte[4];
+        public Reserved Reserved8 { get; } = 4;
 
         /// <summary>
         /// This field is 8 4 byte fields which change meaning based on the effect that is running. 
@@ -95,11 +95,11 @@ namespace Lifx_Lan.Packets.Payloads.Set.MultiZone
         {
             return $@"InstanceId: {InstanceId}
 Type: {Type} ({(byte)Type})
-Reserved6: {BitConverter.ToString(Reserved6)}
+Reserved6: {Reserved6}
 Speed: {Speed}
 Duration: {Duration}
-Reserved7: {BitConverter.ToString(Reserved7)}
-Reserved8: {BitConverter.ToString(Reserved8)}
+Reserved7: {Reserved7}
+Reserved8: {Reserved8}
 Parameters: {BitConverter.ToString(Parameters)}";
         }
 

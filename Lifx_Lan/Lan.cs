@@ -110,6 +110,26 @@ namespace Lifx_Lan
             Console.WriteLine(BitConverter.ToString(BitConverter.GetBytes(boolInt1))); //0x00
             Console.WriteLine(BitConverter.ToString(BitConverter.GetBytes(boolInt2))); //0x01
 
+            Reserved reserved1 = 0;
+            Reserved reserved2 = 1;
+            Reserved reserved3 = 2;
+            Reserved reserved4 = Array.Empty<byte>();
+            Reserved reserved5 = new byte[] { 0x00, 0x01, 0x02 };
+            Reserved reserved6 = new byte[] { 0x00, 0x01, 0x02 };
+            Console.WriteLine(reserved1);
+            Console.WriteLine(reserved2);
+            Console.WriteLine(reserved3);
+            Console.WriteLine(reserved4);
+            Console.WriteLine(reserved5);
+            Console.WriteLine(reserved1 == reserved2);
+            Console.WriteLine(reserved1 == reserved4);
+            Console.WriteLine(reserved5 == reserved6);
+            Console.WriteLine(reserved1.SequenceEqual(reserved2));
+            Console.WriteLine(reserved1.SequenceEqual(reserved4));
+            Console.WriteLine(reserved5.SequenceEqual(reserved6));
+            foreach (byte b in reserved5)
+                Console.WriteLine(b);
+
             Console.ReadLine();
 
             Console.WriteLine(Pkt_Type.EchoRequest.MappedType());
