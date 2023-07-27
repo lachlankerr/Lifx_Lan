@@ -35,7 +35,7 @@ namespace Lifx_Lan.Packets.Payloads.State.MultiZone
         /// <summary>
         /// The first zone represented in the packet
         /// </summary>
-        public ushort Zones_Index { get; } = 0;
+        public ushort Zone_Index { get; } = 0;
 
         /// <summary>
         /// The number of HSBK values in the colors array that map to zones.
@@ -59,7 +59,7 @@ namespace Lifx_Lan.Packets.Payloads.State.MultiZone
                 throw new ArgumentException($"Not enough bytes to read the whole structure for this payload type, expected at least {INIT_SIZE}");
 
             Zones_Count = BitConverter.ToUInt16(bytes, 0);
-            Zones_Index = BitConverter.ToUInt16(bytes, 2);
+            Zone_Index = BitConverter.ToUInt16(bytes, 2);
             Colors_Count = bytes[4];
 
             //secondary check after we have received the Colors_Count value
@@ -82,7 +82,7 @@ namespace Lifx_Lan.Packets.Payloads.State.MultiZone
         public override string ToString()
         {
             return $@"Zones_Count: {Zones_Count}
-Zones_Index: {Zones_Index}
+Zone_Index: {Zone_Index}
 Colors_Count: {Colors_Count}
 Colors: 
 {string.Join($"\n\n", Colors.ToList())}";
@@ -96,7 +96,7 @@ Colors:
             {
                 StateExtendedColorZones stateExtendedColorZones = (StateExtendedColorZones)obj;
                 return Zones_Count == stateExtendedColorZones.Zones_Count &&
-                       Zones_Index == stateExtendedColorZones.Zones_Index &&
+                       Zone_Index == stateExtendedColorZones.Zone_Index &&
                        Colors_Count == stateExtendedColorZones.Colors_Count &&
                        Colors.SequenceEqual(stateExtendedColorZones.Colors);
             }
@@ -104,7 +104,7 @@ Colors:
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Zones_Count, Zones_Index, Colors_Count, Colors);
+            return HashCode.Combine(Zones_Count, Zone_Index, Colors_Count, Colors);
         }
     }
 }

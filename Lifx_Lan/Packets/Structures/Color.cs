@@ -76,5 +76,14 @@ Kelvin: {Kelvin}";
         {
             return HashCode.Combine(Hue, Saturation, Brightness, Kelvin);
         }
+
+        public byte[] ToBytes()
+        {
+            return BitConverter.GetBytes(Hue)
+                .Concat(BitConverter.GetBytes(Saturation))
+                .Concat(BitConverter.GetBytes(Brightness))
+                .Concat(BitConverter.GetBytes(Kelvin))
+                .ToArray();
+        }
     }
 }
