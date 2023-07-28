@@ -27,7 +27,7 @@ namespace Lifx_Lan.Packets.Payloads.State.Tiless
         /// </summary>
         public byte Tile_Index { get; } = 0;
 
-        public byte Reserved6 { get; } = 0;
+        public Reserved Reserved6 { get; } = 0;
 
         /// <summary>
         /// The x coordinate the colors start from
@@ -65,10 +65,10 @@ namespace Lifx_Lan.Packets.Payloads.State.Tiless
             for (int i = 0; i < LEN_COLORS; i++)
             {
                 int offset = i * Color.SIZE;
-                ushort hue = BitConverter.ToUInt16(bytes, 2 + offset);
-                ushort saturation = BitConverter.ToUInt16(bytes, 4 + offset);
-                ushort brightness = BitConverter.ToUInt16(bytes, 6 + offset);
-                ushort kelvin = BitConverter.ToUInt16(bytes, 8 + offset);
+                ushort hue = BitConverter.ToUInt16(bytes, 5 + offset);
+                ushort saturation = BitConverter.ToUInt16(bytes, 7 + offset);
+                ushort brightness = BitConverter.ToUInt16(bytes, 9 + offset);
+                ushort kelvin = BitConverter.ToUInt16(bytes, 11 + offset);
                 Colors[i] = new Color(hue, saturation, brightness, kelvin);
             }
         }
