@@ -36,7 +36,7 @@ namespace Lifx_Lan.Packets.Payloads.Set.Tiles
         /// </summary>
         public byte Length { get; } = 0;
 
-        public Reserved Reserved6 { get; } = 0;
+        public Reserved Reserved6 { get; } = 1;
 
         /// <summary>
         /// The x co-ordinate to start applying colors from. 
