@@ -30,7 +30,7 @@ namespace Lifx_Lan.Packets.Payloads.Get
         /// </summary>
         public byte Length { get; } = 0;
 
-        public byte Reserved6 { get; } = 0;
+        public byte Reserved6 { get; } = 0; //dont use Reserved type for single byte reserved, ends up with more work
 
         /// <summary>
         /// The x value to start from. 

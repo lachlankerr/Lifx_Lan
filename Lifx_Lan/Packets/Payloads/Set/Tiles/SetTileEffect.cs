@@ -25,9 +25,9 @@ namespace Lifx_Lan.Packets.Payloads.Set.Tiles
         /// </summary>
         const int LEN_COLORS = 16;
 
-        public Reserved Reserved8 { get; } = 1;
+        public byte Reserved8 { get; } = 0; //dont use Reserved type for single byte reserved, ends up with more work
 
-        public Reserved Reserved9 { get; } = 1;
+        public byte Reserved9 { get; } = 0; //dont use Reserved type for single byte reserved, ends up with more work
 
         /// <summary>
         /// A unique number identifying this effect.
@@ -90,6 +90,49 @@ namespace Lifx_Lan.Packets.Payloads.Set.Tiles
                 ushort kelvin = BitConverter.ToUInt16(bytes, 6 + offset);
                 Palette[i] = new Color(hue, saturation, brightness, kelvin);
             }
+        }
+
+        public SetTileEffect(byte reserved8, byte reserved9, uint instanceid, TileEffectType type, uint speed, ulong duration, Reserved reserved6, Reserved reserved7, byte[] parameters, byte palette_count, Color[] palette)
+            : base(
+                  new byte[] { reserved8, reserved9 }
+                  .Concat(BitConverter.GetBytes(instanceid))
+                  .Concat(new byte[] { (byte)type })
+                  .Concat(BitConverter.GetBytes(speed))
+                  .Concat(BitConverter.GetBytes(duration))
+                  .Concat(reserved6)
+                  .Concat(reserved7)
+                  .Concat(parameters)
+                  .Concat(new byte[] { palette_count })
+                  .Concat(ToBytes(palette))
+                  .ToArray()
+              )
+        {
+            Reserved8 = reserved8;
+            Reserved9 = reserved9;
+            InstanceId = instanceid;
+            Type = type;
+            Speed = speed;
+            Duration = duration;
+            Reserved6 = reserved6;
+            Reserved7 = reserved7;
+            Parameters = parameters;
+            Palette_Count = palette_count;
+            Palette = palette;
+        }
+
+        /// <summary>
+        /// TODO: one liner this
+        /// </summary>
+        /// <param name="colors"></param>
+        /// <returns></returns>
+        private static byte[] ToBytes(Color[] colors)
+        {
+            byte[] bytes = Array.Empty<byte>();
+            foreach (Color c in colors)
+            {
+                bytes = bytes.Concat(c.ToBytes()).ToArray();
+            }
+            return bytes;
         }
 
         public override string ToString()

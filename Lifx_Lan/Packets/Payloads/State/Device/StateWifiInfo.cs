@@ -19,11 +19,11 @@ namespace Lifx_Lan.Packets.Payloads.State.Device
         /// </summary>
         public float Signal { get; } = 0;
 
-        public byte[] Reserved6 { get; } = new byte[4];
+        public Reserved Reserved6 { get; } = 4;
 
-        public byte[] Reserved7 { get; } = new byte[4];
+        public Reserved Reserved7 { get; } = 4;
 
-        public byte[] Reserved8 { get; } = new byte[2];
+        public Reserved Reserved8 { get; } = 2;
 
         /// <summary>
         /// Creates an instance of the <see cref="StateWifiInfo"/> class so we can see the values received from the packet
@@ -83,9 +83,9 @@ namespace Lifx_Lan.Packets.Payloads.State.Device
         public override string ToString()
         {
             return $@"Signal: {GetSignalStrength()}
-Reserved6: {BitConverter.ToString(Reserved6)}
-Reserved7: {BitConverter.ToString(Reserved7)}
-Reserved8: {BitConverter.ToString(Reserved8)}";
+Reserved6: {Reserved6}
+Reserved7: {Reserved7}
+Reserved8: {Reserved8}";
         }
 
         public override bool Equals(object? obj)

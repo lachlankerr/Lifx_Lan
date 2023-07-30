@@ -39,7 +39,7 @@ namespace Lifx_Lan.Packets.Payloads.State.Light
         /// </summary>
         public ushort Kelvin { get; } = 0;
 
-        public byte[] Reserved6 { get; } = new byte[2];
+        public Reserved Reserved6 { get; } = 2;
 
         /// <summary>
         /// The current power level of the device.
@@ -51,7 +51,7 @@ namespace Lifx_Lan.Packets.Payloads.State.Light
         /// </summary>
         public string Label { get; } = "";
 
-        public byte[] Reserved8 { get; } = new byte[8];
+        public Reserved Reserved8 { get; } = 8;
 
         /// <summary>
         /// Creates an instance of the <see cref="LightState"/> class so we can see the values received from the packet
@@ -139,10 +139,10 @@ namespace Lifx_Lan.Packets.Payloads.State.Light
 Saturation: {UInt16ToPercentage(Saturation) * 100.0f}% ({Saturation})
 Brightness: {UInt16ToPercentage(Brightness) * 100.0f}% ({Brightness})
 Kelvin: {Kelvin}
-Reserved6: {BitConverter.ToString(Reserved6)}
+Reserved6: {Reserved6}
 Power: {Power}
 Label: {Label}
-Reserved8: {BitConverter.ToString(Reserved8)}";
+Reserved8: {Reserved8}";
         }
 
         public override bool Equals(object? obj)

@@ -26,7 +26,7 @@ namespace Lifx_Lan.Packets.Payloads.State.Tiles
         /// </summary>
         const int LEN_COLORS = 16;
 
-        public byte Reserved8 { get; } = 0;
+        public byte Reserved8 { get; } = 0; //dont use Reserved type for single byte reserved, ends up with more work
 
         /// <summary>
         /// The unique value identifying the request
@@ -45,9 +45,9 @@ namespace Lifx_Lan.Packets.Payloads.State.Tiles
         /// </summary>
         public ulong Duration { get; } = 0;
 
-        public byte[] Reserved6 { get; } = new byte[4];
+        public Reserved Reserved6 { get; } = 4;
 
-        public byte[] Reserved7 { get; } = new byte[4];
+        public Reserved Reserved7 { get; } = 4;
 
         /// <summary>
         /// The parameters as specified in the request.
@@ -172,8 +172,8 @@ InstanceId: {InstanceId}
 Type: {Type} ({(byte)Type})
 Speed: {Speed}
 Duration: {Duration}
-Reserved6: {BitConverter.ToString(Reserved6)}
-Reserved7: {BitConverter.ToString(Reserved7)}
+Reserved6: {Reserved6}
+Reserved7: {Reserved7}
 Parameters: {BitConverter.ToString(Parameters)}
 Palette_Count: {Palette_Count}
 Palette: 

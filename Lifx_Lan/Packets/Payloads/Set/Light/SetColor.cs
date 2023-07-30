@@ -18,7 +18,7 @@ namespace Lifx_Lan.Packets.Payloads.Set.Light
     /// </summary>
     internal class SetColor : Payload, ISendable
     {
-        public byte Reserved6 { get; } = 0;
+        public byte Reserved6 { get; } = 0; //dont use Reserved type for single byte reserved, ends up with more work
 
         /// <summary>
         /// The section of the color spectrum that represents the color of your device. 

@@ -16,9 +16,9 @@ namespace Lifx_Lan.Packets.Payloads.Get
     /// </summary>
     internal class GetTileEffect : Payload, ISendable
     {
-        public byte Reserved6 { get; } = 0;
+        public byte Reserved6 { get; } = 0; //dont use Reserved type for single byte reserved, ends up with more work
 
-        public byte Reserved7 { get; } = 0;
+        public byte Reserved7 { get; } = 0; //dont use Reserved type for single byte reserved, ends up with more work
 
         public GetTileEffect(byte[] bytes) : base(bytes)
         {

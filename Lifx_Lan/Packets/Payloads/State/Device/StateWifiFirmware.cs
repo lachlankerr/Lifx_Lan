@@ -16,7 +16,7 @@ namespace Lifx_Lan.Packets.Payloads.State.Device
         /// </summary>
         public ulong Build { get; } = 0;
 
-        public byte[] Reserved6 { get; } = new byte[8];
+        public Reserved Reserved6 { get; } = 8;
 
         /// <summary>
         /// The minor component of the version.
@@ -47,7 +47,7 @@ namespace Lifx_Lan.Packets.Payloads.State.Device
         public override string ToString()
         {
             return $@"Build: {Build}
-Reserved6: {BitConverter.ToString(Reserved6)}
+Reserved6: {Reserved6}
 Version_Minor: {Version_Minor}
 Version_Major: {Version_Major}";
         }

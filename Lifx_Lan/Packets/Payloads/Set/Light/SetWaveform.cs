@@ -10,7 +10,7 @@ namespace Lifx_Lan.Packets.Payloads.Set.Light
 {
     internal class SetWaveform : Payload, ISendable
     {
-        public byte Reserved6 { get; } = 0;
+        public byte Reserved6 { get; } = 0; //dont use Reserved type for single byte reserved, ends up with more work
 
         public byte Transient { get; } = 0;
 

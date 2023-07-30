@@ -30,7 +30,7 @@ namespace Lifx_Lan.Packets.Payloads.State.Device
         /// <summary>
         /// 
         /// </summary>
-        public byte[] Reserved6 { get; } = new byte[4];
+        public Reserved Reserved6 { get; } = 4;
 
         /// <summary>
         /// Creates an instance of the <see cref="StateVersion"/> class so we can see the values received from the packet
@@ -51,7 +51,7 @@ namespace Lifx_Lan.Packets.Payloads.State.Device
         {
             return $@"Vendor: {Vendor}
 Product: {Product}
-Reserved6: {BitConverter.ToString(Reserved6)}";
+Reserved6: {Reserved6}";
         }
 
         public override bool Equals(object? obj)

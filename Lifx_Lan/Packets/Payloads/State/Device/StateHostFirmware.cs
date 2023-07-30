@@ -30,7 +30,7 @@ namespace Lifx_Lan.Packets.Payloads.State.Device
         /// <summary>
         /// 
         /// </summary>
-        public byte[] Reserved6 { get; } = new byte[8];
+        public Reserved Reserved6 { get; } = 8;
 
         /// <summary>
         /// The minor component of the firmware version
@@ -61,7 +61,7 @@ namespace Lifx_Lan.Packets.Payloads.State.Device
         public override string ToString()
         {
             return $@"Build: {Build}
-Reserved6: {BitConverter.ToString(Reserved6)}
+Reserved6: {Reserved6}
 Version_Minor: {Version_Minor}
 Version_Major: {Version_Major}";
         }

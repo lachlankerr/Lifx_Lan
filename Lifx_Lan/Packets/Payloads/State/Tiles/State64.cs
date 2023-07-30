@@ -27,7 +27,7 @@ namespace Lifx_Lan.Packets.Payloads.State.Tiless
         /// </summary>
         public byte Tile_Index { get; } = 0;
 
-        public Reserved Reserved6 { get; } = 1;
+        public byte Reserved6 { get; } = 0; //dont use Reserved type for single byte reserved, ends up with more work
 
         /// <summary>
         /// The x coordinate the colors start from

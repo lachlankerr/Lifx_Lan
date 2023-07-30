@@ -36,7 +36,7 @@ namespace Lifx_Lan.Packets.Payloads.Set.Tiles
         /// </summary>
         public byte Length { get; } = 0;
 
-        public Reserved Reserved6 { get; } = 1;
+        public byte Reserved6 { get; } = 0; //dont use Reserved type for single byte reserved, ends up with more work
 
         /// <summary>
         /// The x co-ordinate to start applying colors from. 
@@ -94,10 +94,9 @@ namespace Lifx_Lan.Packets.Payloads.Set.Tiles
             }
         }
 
-        public Set64(byte tile_index, byte length, Reserved reserved6, byte x, byte y, byte width, uint duration, Color[] colors)
+        public Set64(byte tile_index, byte length, byte reserved6, byte x, byte y, byte width, uint duration, Color[] colors)
             : base(
-                  new byte[] { tile_index, length }
-                  .Concat(reserved6)
+                  new byte[] { tile_index, length, reserved6 }
                   .Concat(new byte[] { x, y, width })
                   .Concat(BitConverter.GetBytes(duration))
                   .Concat(ToBytes(colors))
