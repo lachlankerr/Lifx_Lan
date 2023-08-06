@@ -1,23 +1,14 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Json;
-using System.Threading;
 using Lifx_Lan.Packets;
 using Lifx_Lan.Packets.Enums;
-using Lifx_Lan.Packets.Payloads;
 using Lifx_Lan.Packets.Payloads.Get;
-using Lifx_Lan.Packets.Payloads.State;
 using Lifx_Lan.Packets.Payloads.State.Device;
 using Lifx_Lan.Packets.Payloads.State.Discovery;
-using Lifx_Lan.Packets.Payloads.State.MultiZone;
 using Lifx_Lan.Packets.Payloads.State.Relay;
-using Lifx_Lan.Packets.Payloads.State.Tiles;
 
 namespace Lifx_Lan
 {
@@ -45,6 +36,10 @@ namespace Lifx_Lan
 
         static async Task Main(string[] args)
         {
+            Lan lan = new Lan();
+            PrintStartupInformation();
+            List<Device> devices = await PickDevicesToUse(lan);
+
             //NetworkInfo info = new NetworkInfo("", 0, new LifxPacket(Pkt_Type.GetService, true));
             //Product prod = new Product("", 1, 1, 1, 1);
             //Device dev1 = new Device(info, prod);
@@ -90,7 +85,7 @@ namespace Lifx_Lan
 
             SaveFoundDevicesToFileAsync(devices);*/
 
-            BoolInt boolInt1 = false;
+            /*BoolInt boolInt1 = false;
             BoolInt boolInt2 = true;
             BoolInt boolInt3 = 0;
             BoolInt boolInt4 = 1;
@@ -132,10 +127,9 @@ namespace Lifx_Lan
 
             Console.ReadLine();
 
-            Console.WriteLine(Pkt_Type.EchoRequest.MappedType());
-            List<Device> devices = await ReadSavedDevicesFromFileAsync();
-            Lan lan = new Lan();
-            lan.StartReceivingPacketsAsync();
+            Console.WriteLine(Pkt_Type.EchoRequest.MappedType());*/
+            //List<Device> devices = await ReadSavedDevicesFromFileAsync();
+            //lan.StartReceivingPacketsAsync();
             foreach (Device dev in devices)
             {
                 Console.WriteLine(dev.Product.Label);
@@ -159,10 +153,10 @@ namespace Lifx_Lan
                 Console.WriteLine();
             }
 
-            Console.WriteLine("Still receiving packets, press enter to exit");
+            //Console.WriteLine("Still receiving packets, press enter to exit");
             Console.ReadLine(); 
 
-            lan.StopReceivingPackets();
+            //lan.StopReceivingPackets();
             await Task.Delay(ONE_SECOND);
 
             //Decoder.PrintFields(pkt.ToBytes());
@@ -240,6 +234,58 @@ namespace Lifx_Lan
             Console.WriteLine(state);*/
 
             Console.ReadLine();
+        }
+
+        public static void PrintStartupInformation()
+        {
+            Console.WriteLine("Lifx_Lan");
+            Console.WriteLine("A console app to control and get information about any LIFX based smart lighting device.");
+            Console.WriteLine("");
+            Console.WriteLine("");
+            Console.WriteLine("");
+        }
+
+        public static async Task<List<Device>> PickDevicesToUse(Lan lan)
+        {
+            Console.WriteLine("1. Start device discovery");
+            Console.WriteLine("2. Use saved devices");
+
+            lan.StartReceivingPacketsAsync();
+
+            string response = Console.ReadLine()!;
+            List<Device> devices = new List<Device>();
+
+            switch (response)
+            {
+                case "1":
+                    lan.StartSendingDiscoveryPacketsAsync();
+                    await Task.Delay(ONE_SECOND * 3);
+                    lan.StopSendingDiscoveryPackets();
+
+                    List<string> deviceIPs = new List<string>();
+
+                    foreach (NetworkInfo netinfo in lan.ReceivedPackets.ToList())
+                    {
+                        if (netinfo.Packet.ProtocolHeader.Pkt_Type == Pkt_Type.StateService && !deviceIPs.Contains(netinfo.Address))
+                        {
+                            Device device = await lan.CreateDeviceFromStateServiceAsync(netinfo);
+                            Console.WriteLine($"{device}\n");
+                            devices.Add(device);
+                            deviceIPs.Add(netinfo.Address.ToString());
+                        }
+                    }
+
+                    SaveFoundDevicesToFileAsync(devices);
+                    break;
+                case "2":
+                    devices = await ReadSavedDevicesFromFileAsync();
+                    break;
+                default:
+                    break;
+
+
+            }
+            return devices;
         }
 
         public async Task<byte[]> SendToDeviceThenReceiveAsync(Device device, Pkt_Type pkt_type, byte[] payload, int waits = 10)
