@@ -1,5 +1,10 @@
 ﻿using Lifx_Lan.Packets.Enums;
 using Lifx_Lan.Packets.Payloads.Get;
+using Lifx_Lan.Packets.Payloads.Set.Device;
+using Lifx_Lan.Packets.Payloads.Set.Light;
+using Lifx_Lan.Packets.Payloads.Set.MultiZone;
+using Lifx_Lan.Packets.Payloads.Set.Relay;
+using Lifx_Lan.Packets.Payloads.Set.Tiles;
 using Lifx_Lan.Packets.Payloads.State.Device;
 using Lifx_Lan.Packets.Payloads.State.Discovery;
 using Lifx_Lan.Packets.Payloads.State.Light;
@@ -152,33 +157,33 @@ namespace Lifx_Lan
                 ////////////////
 
                 //Device
-                //case Pkt_Type.SetPower: return typeof(SetPower);
-                //case Pkt_Type.SetLabel: return typeof(SetLabel);
+                case Pkt_Type.SetPower: return typeof(SetPower);
+                case Pkt_Type.SetLabel: return typeof(SetLabel);
                 //case Pkt_Type.SetReboot: return typeof(SetReboot);
-                //case Pkt_Type.SetLocation: return typeof(SetLocation);
-                //case Pkt_Type.SetGroup: return typeof(SetGroup);
+                case Pkt_Type.SetLocation: return typeof(SetLocation);
+                case Pkt_Type.SetGroup: return typeof(SetGroup);
 
                 //Light
-                //case Pkt_Type.SetColor: return typeof(SetColor);
-                //case Pkt_Type.SetWaveform: return typeof(SetWaveform);
-                //case Pkt_Type.SetLightPower: return typeof(SetLightPower);
-                //case Pkt_Type.SetWaveformOptional: return typeof(SetWaveformOptional);
-                //case Pkt_Type.SetInfrared: return typeof(SetInfrared);
-                //case Pkt_Type.SetHevCycle: return typeof(SetHevCycle);
-                //case Pkt_Type.SetHevCycleConfiguration: return typeof(SetHevCycleConfiguration);
+                case Pkt_Type.SetColor: return typeof(SetColor);
+                case Pkt_Type.SetWaveform: return typeof(SetWaveform);
+                case Pkt_Type.SetLightPower: return typeof(SetLightPower);
+                case Pkt_Type.SetWaveformOptional: return typeof(SetWaveformOptional);
+                case Pkt_Type.SetInfrared: return typeof(SetInfrared);
+                case Pkt_Type.SetHevCycle: return typeof(SetHevCycle);
+                case Pkt_Type.SetHevCycleConfiguration: return typeof(SetHevCycleConfiguration);
 
                 //MultiZone
-                //case Pkt_Type.SetColorZones: return typeof(SetColorZones);
-                //case Pkt_Type.SetMultiZoneEffect: return typeof(SetMultiZoneEffect);
-                //case Pkt_Type.SetExtendedColorZones: return typeof(SetExtendedColorZones);
+                case Pkt_Type.SetColorZones: return typeof(SetColorZones);
+                case Pkt_Type.SetMultiZoneEffect: return typeof(SetMultiZoneEffect);
+                case Pkt_Type.SetExtendedColorZones: return typeof(SetExtendedColorZones);
 
                 //Relay
-                //case Pkt_Type.SetRPower: return typeof(SetRPower);
+                case Pkt_Type.SetRPower: return typeof(SetRPower);
 
                 //Tile
-                //case Pkt_Type.SetUserPosition: return typeof(SetUserPosition);
-                //case Pkt_Type.Set64: return typeof(Set64);
-                //case Pkt_Type.SetTileEffect: return typeof(SetTileEffect);
+                case Pkt_Type.SetUserPosition: return typeof(SetUserPosition);
+                case Pkt_Type.Set64: return typeof(Set64);
+                case Pkt_Type.SetTileEffect: return typeof(SetTileEffect);
 
 
                 //////////////////
