@@ -157,7 +157,7 @@ namespace Lifx_Lan
             Console.ReadLine(); 
 
             //lan.StopReceivingPackets();
-            await Task.Delay(ONE_SECOND);
+            //await Task.Delay(ONE_SECOND);
 
             //Decoder.PrintFields(pkt.ToBytes());
             //Decoder.PrintFields(lan.ReceivedPackets[0].Packet.ToBytes());
@@ -220,7 +220,7 @@ namespace Lifx_Lan
 
             //Console.WriteLine(effect.Parameters.Size());
 
-            Console.ReadLine();
+            //Console.ReadLine();
 
             /*StateMultiZone state = new StateMultiZone(new byte[] { 0x00, 0x00,
             0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00,
@@ -233,7 +233,7 @@ namespace Lifx_Lan
             0x08, 0x00, 0x08, 0x00, 0x08, 0x00, 0x08, 0x00, });
             Console.WriteLine(state);*/
 
-            Console.ReadLine();
+            //Console.ReadLine();
         }
 
         public static void PrintStartupInformation()
