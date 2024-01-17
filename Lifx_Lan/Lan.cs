@@ -1,13 +1,16 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text.Json;
 using Lifx_Lan.Packets;
 using Lifx_Lan.Packets.Enums;
+using Lifx_Lan.Packets.Payloads;
 using Lifx_Lan.Packets.Payloads.Get;
 using Lifx_Lan.Packets.Payloads.State.Device;
 using Lifx_Lan.Packets.Payloads.State.Discovery;
+using Lifx_Lan.Packets.Payloads.State.Light;
 using Lifx_Lan.Packets.Payloads.State.Relay;
 
 namespace Lifx_Lan
@@ -38,7 +41,19 @@ namespace Lifx_Lan
         {
             Lan lan = new Lan();
             PrintStartupInformation();
-            List<Device> devices = await PickDevicesToUse(lan);
+            List<Device> devices = await PickSourceOfDevices(lan);
+            Device pickedDevice = PickDeviceToUse(devices);
+            List<Pkt_Type> validTypes = ListAllValidMessageTypes(pickedDevice);
+            Pkt_Type pickedType = PickTypeToSend(validTypes);
+
+            byte[] bytes = new GetRPower(0).Bytes;
+            //byte[] bytes = new byte[0];
+            var response = await lan.SendToDeviceThenReceiveAsync(pickedDevice, pickedType, bytes);
+            var test = (Type[])response.Type.MappedType().GetMethod("ReturnMessages")!.Invoke(null, null)!;
+            //Console.WriteLine(new LightState());
+
+            var instance = Activator.CreateInstance(test[0]);
+            Console.WriteLine(instance);
 
             //NetworkInfo info = new NetworkInfo("", 0, new LifxPacket(Pkt_Type.GetService, true));
             //Product prod = new Product("", 1, 1, 1, 1);
@@ -130,7 +145,9 @@ namespace Lifx_Lan
             Console.WriteLine(Pkt_Type.EchoRequest.MappedType());*/
             //List<Device> devices = await ReadSavedDevicesFromFileAsync();
             //lan.StartReceivingPacketsAsync();
-            foreach (Device dev in devices)
+
+            //==============================
+            /*foreach (Device dev in devices)
             {
                 Console.WriteLine(dev.Product.Label);
                 //Console.WriteLine(dev.Product.Features.AsFlag());
@@ -152,10 +169,10 @@ namespace Lifx_Lan
                 }
                 Console.WriteLine();
             }
-
+            
             //Console.WriteLine("Still receiving packets, press enter to exit");
-            Console.ReadLine(); 
-
+            Console.ReadLine();*/
+            //=====================================
             //lan.StopReceivingPackets();
             //await Task.Delay(ONE_SECOND);
 
@@ -245,7 +262,7 @@ namespace Lifx_Lan
             Console.WriteLine("");
         }
 
-        public static async Task<List<Device>> PickDevicesToUse(Lan lan)
+        public static async Task<List<Device>> PickSourceOfDevices(Lan lan)
         {
             Console.WriteLine("1. Start device discovery");
             Console.WriteLine("2. Use saved devices");
@@ -253,6 +270,7 @@ namespace Lifx_Lan
             lan.StartReceivingPacketsAsync();
 
             string response = Console.ReadLine()!;
+            Console.WriteLine();
             List<Device> devices = new List<Device>();
 
             switch (response)
@@ -288,7 +306,70 @@ namespace Lifx_Lan
             return devices;
         }
 
-        public async Task<byte[]> SendToDeviceThenReceiveAsync(Device device, Pkt_Type pkt_type, byte[] payload, int waits = 10)
+        public static Device PickDeviceToUse(List<Device> devices)
+        {
+            Console.WriteLine("Choose which device to interact with (default or error will choose 1)");
+            for (int i = 1; i < devices.Count; i++)
+            {
+                Console.WriteLine($"{i}: {devices[i-1].Product.Label}");
+            }
+            string response = Console.ReadLine()!;
+            Console.WriteLine();
+            int choice = 1;
+            Int32.TryParse(response, out choice);
+            if (devices.ElementAtOrDefault(choice - 1) == null)
+            {
+                choice = 1;
+            }
+            Device result = devices[choice - 1];
+            Console.WriteLine($"{result}\n");
+            return result;
+        }
+
+        public static Pkt_Type PickTypeToSend(List<Pkt_Type> types)
+        {
+            string response = Console.ReadLine()!;
+            Console.WriteLine();
+            ushort choice = 1;
+            UInt16.TryParse(response, out choice);
+            if (!Enum.IsDefined(typeof(Pkt_Type), choice))
+            {
+                choice = (ushort)types.First();
+            }
+            Pkt_Type result = (Pkt_Type)Enum.ToObject(typeof(Pkt_Type), choice);
+            Console.WriteLine($"{result}\n");
+            return result;
+        }
+
+        public static List<Pkt_Type> ListAllValidMessageTypes(Device device)
+        {
+            var packetTypes = Enum.GetValues(typeof(Pkt_Type)).Cast<Pkt_Type>();
+            List<Pkt_Type> validTypes = new List<Pkt_Type>();
+            foreach (Pkt_Type packetType in packetTypes)
+            {
+                try 
+                {
+                    Type type = packetType.MappedType();
+                    if (typeof(ISendable).IsAssignableFrom(type))
+                    {
+                        if (device.Product.HasCapabilities((FeaturesFlags)type.GetMethod("NeededCapabilities")!.Invoke(null, null)!))
+                        {
+                            validTypes.Add(packetType);
+                            Console.WriteLine($"{(ushort)packetType}: {packetType}");
+                        }
+                    }
+                }
+                catch (NotSupportedException) //no bytes are required for these message types so no class was created (for now)
+                {
+                    validTypes.Add(packetType);
+                    Console.WriteLine($"{(ushort)packetType}: {packetType}");
+                    continue;
+                }
+            }
+            return validTypes;
+        }
+
+        public async Task<(Pkt_Type Type, byte[] Bytes)> SendToDeviceThenReceiveAsync(Device device, Pkt_Type pkt_type, byte[] payload, int waits = 10)
         {
             LifxPacket pkt = new LifxPacket(device.NetworkInfo.Packet.FrameAddress.Target, pkt_type, payload);
             IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(device.NetworkInfo.Address), device.NetworkInfo.Port);
@@ -306,10 +387,10 @@ namespace Lifx_Lan
             if (waits <= 0)
                 throw new TimeoutException("No response received");
 
-            return responses[0].Packet.Payload.ToBytes();
+            return (responses[0].Packet.ProtocolHeader.Pkt_Type, responses[0].Packet.Payload.ToBytes());
         }
 
-        public async Task<byte[]> SendToDeviceThenReceiveAsync(Device device, Pkt_Type pkt_type, int waits = 10)
+        public async Task<(Pkt_Type Type, byte[] Bytes)> SendToDeviceThenReceiveAsync(Device device, Pkt_Type pkt_type, int waits = 10)
         {
             return await SendToDeviceThenReceiveAsync(device, pkt_type, new byte[0], waits);
         }

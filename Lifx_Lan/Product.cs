@@ -163,7 +163,7 @@ namespace Lifx_Lan
 Vendor: {Vendor_Name} ({Vendor_ID})
 Name: {Product_Name} ({Product_ID})
 Firmware: ({Firmware_Major}, {Firmware_Minor})
-Features: {Features}";
+{Features}";
         }
 
         public override bool Equals(object? obj)
